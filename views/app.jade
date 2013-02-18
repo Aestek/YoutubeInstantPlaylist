@@ -1,0 +1,179 @@
+!!! 5
+html(lang='en', ng-app='app')
+	head
+		meta(charset='utf-8')
+		title YoutubeInstantPlaylist
+		
+		link(href='lib/bootstrap/less/bootstrap.css', rel='stylesheet', type='text/css')
+		link(href='stylesheets/app/app.css', rel='stylesheet', type='text/css')
+
+		script(src='lib/jquery/jquery-1.7.1.min.js', type='text/javascript')
+		script(src='lib/angular.min.js', type='text/javascript')
+		script(src='lib/angular-ui/angular-ui.js', type='text/javascript')
+		script(src='lib/jquery.tinyscrollbar.min.js', type='text/javascript')
+		script(src='lib/swfobject.js', type='text/javascript')
+		script(src='/socket.io/socket.io.js', type='text/javascript')
+		script(src='lib/jquery.qrcode.js', type='text/javascript')
+
+		script(src='javascripts/app.js', type='text/javascript')
+		script(src='javascripts/services.js', type='text/javascript')
+		script(src='javascripts/app-controllers.js', type='text/javascript')
+		script(src='javascripts/directives.js', type='text/javascript')
+		script(src='javascripts/filters.js', type='text/javascript')
+
+	body(ng-controller='MainCtrl')
+
+		// search
+		.well.row12.col5(ng-controller='SearchCtrl')
+			input.title(
+				type='text', 
+				placeholder='Search Youtube', 
+				ng-model='searchQuery',
+				ui-keypress='{13: \'search(searchQuery)\'}'
+			)
+	
+			.block-content
+				.no-content(ng-show='searchResults.length == 0') Your search yieled no result
+				.no-content(ng-show='searchResults == -1') Search videos to add in your playlist
+				div(scrollable='y', scroll-bind='searchResults')
+					.scrollbar
+						.track
+							.thumb
+
+					.viewport
+						.overview
+							ul.vertical-video-list
+								li(
+									ng-repeat='result in searchResults',
+									title='{{result.title}}',
+									ng-click='addVideo(result)'
+								)
+				
+									.img(back-img='{{result.thumbnail.hqDefault}}')
+										.length {{result.duration | secToTime}}
+									.title {{result.title}}
+									.infos
+										| Views : {{result.viewCount}}
+
+
+		// player
+		.well.col7.coloffset5.row9
+			.title(
+				background-progressbar, 
+				fgcolor='#6FB827', 
+				bgcolor='#424242', 
+				progress='currentVideoProgress'
+			) {{currentVideo.title}}
+				
+			.block-content
+				.no-content(ng-show='!currentVideo.id') Select a video to play
+
+				div(
+					youtube-player, 
+					video='currentVideo', 
+					current-time='currentTime',
+					player-state='playerState'
+				)
+
+		// infos
+		.well.col4.coloffset12.row6
+			#video-top-infos.block-padding
+				strong Added by : 
+				| {{currentVideo.uploader}}
+				br
+				strong On : 
+				| {{currentVideo.uploaded | date:'medium'}}
+				hr
+			#video-description(scrollable='y', scroll-bind='currentVideo.description')
+				.scrollbar
+					.track
+						.thumb
+
+				.viewport
+					.overview.block-padding(ng-bind-html-unsafe='currentVideo.description | formatText')
+
+		
+		// remote
+		#remote.well.col4.coloffset12.row3.rowoffset6
+			div(
+				qr-code='http://192.168.1.21:3000/remote?{{roomId}}', 
+				width='500', 
+				height='500',
+				fgcolor='#424242', 
+				bgcolor='#f5f5f5'
+			) 
+				| Scan this qrcode to control the player with your phone !
+		
+		// related 
+		.col11.coloffset5.row3.rowoffset9
+			.well(
+				scrollable='x', 
+				scroll-bind='currentVideo.relatedVideos'
+			)
+				.viewport
+					ul.horizontal-video-list.overview
+						li(
+							ng-repeat='video in currentVideo.relatedVideos', 
+							ng-click='addVideo(video)'
+						)
+							.img(back-img='{{video.thumbnail.hqDefault}}')
+								.title-container {{video.title}}
+								.duration {{video.duration | secToTime}}
+
+				.scrollbar
+					.track
+						.thumb
+
+		//playlist
+		.well.col16.row4.rowoffset12(ng-controller='PlaylistCtrl')
+			.title(
+				background-progressbar, 
+				fgcolor='#6FB827', 
+				bgcolor='#424242', 
+				progress='playlistProgress'
+			)
+				#playlistPosition {{currentPosition + 1}}/{{playlist.length}}
+				#playlistTime {{playedDuration + currentTime | secToTime}} / {{totalDuration | secToTime}}
+
+				button.btn.btn-danger.pull-right(ng-click='removeAll()')
+					i.icon-remove-sign.icon-white
+					|  Clear
+
+				#playlist-control.btn-group
+					button.btn.btn-large(
+						ng-click='setIndex(currentPosition - 1)',
+						ng-disabled='currentPosition <= 0'
+					)
+						i.icon-step-backward
+					button.btn.btn-large(
+						ng-click='setIndex(currentPosition + 1)',
+						ng-disabled='currentPosition == playlist.length - 1'
+					)
+						i.icon-step-forward
+
+			.block-content
+				div.no-content(ng-show='playlist.length == 0') Your playlist is currently empty
+				div(scrollable='x', scroll-bind='playlist')
+					.viewport
+						ul.horizontal-video-list.overview
+							li(
+								ng-repeat='video in playlist', 
+								ng-click='setIndex($index)',
+								ng-class='(currentPosition == $index) && "playing"'
+							)
+								.img(back-img='{{video.thumbnail.hqDefault}}')
+									.title-container {{video.title}}
+
+									.buttons
+										button.btn.btn-danger(ng-click='removeAt($index)')
+											i.icon-remove-sign.icon-white
+
+									.duration {{video.duration | secToTime}}
+
+									.playlist-id {{$index + 1}}
+
+					.scrollbar
+						.track
+							.thumb
+			#playlistBar
+				div

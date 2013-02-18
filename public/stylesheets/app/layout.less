@@ -1,0 +1,77 @@
+body {
+	background: #CCCCCC;
+}
+
+.well {
+	padding: 0;
+	border: 0;
+	.shadow(#aaa, 5px);
+	.rounded-corners(0);
+	margin: 0;
+
+	& > .title {
+		background-color: @mainColor;
+		padding: 5px;
+		margin: 0;
+		height: @titleHeight;
+		.box-sizing();
+		width: 100%;
+
+		line-height: @titleHeight - 10px;
+		text-shadow: 0px 0px 3px black;
+		text-align: center;
+		color: white;
+		border: 0;
+	}
+
+	input.title {
+		text-align: left;
+	}
+	
+}
+
+.nav-tabs {
+	margin: 0;
+
+	li {
+		.rounded-corners(0);
+		border: 0;
+		background: @mainColor;
+		height: 40px;
+
+		&.active {
+			background: @wellBackground;
+
+			a {
+				color: @mainColor;
+			}
+		}
+
+		a {
+			background-color: transparent !important;
+			border: 0 !important;
+			color: white;
+		}
+	}
+}
+
+.block-content {
+	position: relative;
+	.box-sizing();
+	.height-minus100(@titleHeight);
+
+	.no-content {
+		width: 100%;
+		text-align: center;
+		font-size: large;
+		position: absolute;
+		line-height: 20px;
+		top: 50%;
+		margin-top: -10px;
+	}
+}
+
+.block-padding {
+	padding: 7px;
+	.box-sizing();
+}

@@ -1,0 +1,94 @@
+[scrollable] {
+	height: 100%;
+
+	&:hover .scrollbar {
+		visibility: visible;
+	}
+
+	.viewport {
+        overflow: hidden;
+        position: relative;
+
+        .overview {
+	        position: absolute;
+	    }
+    }
+
+    .scrollbar {
+        position: relative;
+        visibility: hidden;
+
+        &.disable {
+	        display: none;
+	    }
+	    
+
+        .track {
+        	 .thumb {
+		        cursor: pointer;
+		        position: absolute;
+
+		        background-color: @mainColorLight;
+		    }
+		}
+    }
+
+    
+}
+
+[scrollable='y'] {
+
+    .scrollbar {
+        float: right;
+        width: 5px;
+
+        .track {
+	        height: 100%;
+	        width: 100%;
+
+	         .thumb {
+		        height: 20px;
+		        width: 100%;
+		        top: 0;
+		    }
+	    }
+    }
+
+    .viewport {
+    	height: 100%;
+    	
+         .overview {
+	        width: 100%;
+	    }
+    }
+}
+
+[scrollable='x'] {
+	width: 100%;
+
+	.scrollbar {
+        height: 5px;
+
+        .track {
+        	height: 100%;
+
+	         .thumb {
+		        width: 20px;
+		        height: 100%;
+		        left: 0;
+		    }
+	    }
+    }
+
+	.viewport {
+		.height-minus100(10px);
+		width: 100%;
+
+        .overview {
+        	left: 0;
+        	top: 0;
+        	height: 100%;
+        	width: 100000px;
+        }
+    }
+}
