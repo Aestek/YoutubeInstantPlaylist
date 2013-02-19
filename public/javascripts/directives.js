@@ -1,3 +1,6 @@
+
+// directive wrapper for the tinyscrollbar jQuery plugin
+
 app.directive('scrollable', function() {
 	return function(scope, element, attrs) {
 		var $el = $(element);
@@ -5,7 +8,6 @@ app.directive('scrollable', function() {
 		$el.tinyscrollbar({
 			axis: attrs.scrollable
 		});
-
 
 		if (attrs.scrollBind) {
 			scope.$watch(attrs.scrollBind, function() {
@@ -17,6 +19,10 @@ app.directive('scrollable', function() {
 	}
 });
 
+
+// directive wrapper for YoutubePlayer
+
+// player event callback must be accessible from the global scope
 var onYouTubePlayerReady;
 var onYouTubePlayerStateChange;
 app.directive('youtubePlayer', function() {
@@ -25,64 +31,66 @@ app.directive('youtubePlayer', function() {
      	replace: false,
     	scope: {
       		video: '=',
-     		playing : '=',
      		currentTime: '=',
      		playerState: '='
      	},
-     	controller: function($scope, $element) {
+     	controller: function($scope, $element, guid) {
      		var $el = $($element);
 
-			function makeid() {
-			    var text = "";
-			    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-			    for( var i=0; i < 5; i++ )
-			        text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-			    return text;
-			}
-
-			var container = 'player' + makeid();
+     		// swfobject requires an id to append the object in the element
+			var container = 'player' + guid.get();
 			$el.attr('id', container);
-		    var url = 'http://www.youtube.com/v/K-aERDSzU10?enablejsapi=1&playerapiid=' + container + '';
-		    var att = { data: url, width: "100%", height: "100%" };
-		    var par = { allowScriptAccess: "always", 'wmode': 'transparent' };
-		    player = swfobject.createSWF(att, par, container);
+
+			// YoutubePlayer requires a video id to load
+		    var att = { 
+		    	data: 'http://www.youtube.com/v/K-aERDSzU10?enablejsapi=1&playerapiid=' + container,
+		    	width: '100%', 
+		    	height: '100%' 
+		    };
+		    var par = { 
+		    	allowScriptAccess: 'always', 
+		    	wmode: 'transparent' 
+		    };
+
+		    function switchPlayerVisibility(v) {
+		    	var vis = v ? 'visible' : 'hidden';
+		    	$(document.getElementById(container)).css('visibility', vis);
+		    }
 
 		    onYouTubePlayerReady = function(id) {
-		    	player.mute();
+		    	switchPlayerVisibility(false);
 
-		    	$('#' + container).css('visibility', 'hidden');
-
-		    	var currentTiemInterval = setInterval(function() {
+		    	setInterval(function() {
 		    		$scope.$apply(function() {
 		    			$scope.currentTime = player.getCurrentTime();
 		    		});
-		    	}, 250);
+		    	}, 500);
 
 		    	onYouTubePlayerStateChange = function(state) {
 		    		$scope.playerState = state;
-		    		$scope.playing = state === 1;
 		    	};
 
 		    	player.addEventListener('onStateChange', 'onYouTubePlayerStateChange');
 
 			    $scope.$watch('video', function() {
 			    	if ($scope.video.id) {
-			    		$('#' + container).css('visibility', 'visible');
+			    		switchPlayerVisibility(true);
 			    		player.loadVideoById($scope.video.id);
 			    	}
 			    	else {
-			    		$('#' + container).css('visibility', 'hidden');
+			    		switchPlayerVisibility(false);
 			    		player.pauseVideo();
 			    	}
 			    });
-			}
-     	}
+			};
 
+			player = swfobject.createSWF(att, par, container);
+     	}
     };
 });	
 
+
+// directive allowing to display a progressbar in the background of an element with css gradients
 
 app.directive('backgroundProgressbar', function() {
 	return {
@@ -93,7 +101,6 @@ app.directive('backgroundProgressbar', function() {
      		var $el = $($element);
 
      		$scope.$watch($attrs.progress, function(p) {
-     			//console.log('-webkit-gradient(linear, left top, right top, color-stop(0%,' + $scope.fgcolor +  '), color-stop(' + intval(progress) + '%,' + $scope.fgcolor +  '), color-stop(' + (intval(progress) + 0.1) + '%,' + $scope.bgcolor +  '), color-stop(100%,' + $scope.bgcolor +  '))');
      			$el.css(
      				'background', 
      				'-webkit-gradient(linear, left top, right top, color-stop(0%,' + $attrs.fgcolor +  '), color-stop(' + p + '%,' + $attrs.fgcolor +  '), color-stop(' + (p + 0.1) + '%,' + $attrs.bgcolor +  '), color-stop(100%,' + $attrs.bgcolor +  '))'
@@ -102,6 +109,8 @@ app.directive('backgroundProgressbar', function() {
     	}
     };
 });
+
+// directive displaying a bacground-image in an element, avoiding non-angular-parsed url loading
 
 app.directive('backImg', function() {
     return function(scope, element, attrs){
@@ -113,6 +122,8 @@ app.directive('backImg', function() {
         });
     };
 });
+
+// directive wrapper for the qrCode jQuery plugin
 
 app.directive('qrCode', function() {
 	return function(scope, element, attrs) {

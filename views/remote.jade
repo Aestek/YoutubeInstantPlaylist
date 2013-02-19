@@ -29,8 +29,18 @@ html(lang='en', ng-app='app')
 		.container-fluid
 			div(ng-show='currentVideo.id')
 				h1 Now playing : 
-					
-				.current-video(back-img='{{currentVideo.thumbnail.hqDefault}}')
+				
+				#controls.btn-group
+					button.btn.btn-large(ng-click='prev()')
+						i.icon-step-backward
+					button.btn.btn-large(ng-click='next()')
+						i.icon-step-forward
+
+				a.current-video(
+					back-img='{{currentVideo.thumbnail.hqDefault}}',
+					href='{{currentVideo.player.mobile}}',
+					target='_blank'
+				)
 					.title {{currentVideo.title}}
 				
 

@@ -1,16 +1,20 @@
-function MainCtrl($scope, videoStore, socket) {
+function MainCtrl($scope, videoStore) {
+
+	// properties
+
 	$scope.playlist = [];
 	$scope.currentPosition = -1;
 	$scope.currentVideo = {};
 	$scope.currentVideoProgress = 0;
 	$scope.currentTime = 0;
 	$scope.playerState = -1;
-	$scope.roomId = 'azerty';
+
+	// methods
 
 	$scope.addVideo = function(v) {
 		if (($scope.playlist[$scope.playlist.length -1] || {}).id != v.id) {
 			var i = $scope.playlist.push(v) - 1;
-			if ($scope.playlist.length == 1)
+			if (i == 0)
 				$scope.setIndex(0);
 			return i;
 		}
@@ -44,20 +48,10 @@ function MainCtrl($scope, videoStore, socket) {
 		$scope.currentVideoProgress = 0;
 	};
 
-	socket.emit('init', $scope.roomId, function() {
-		console.log('Socket inited');
-	});
-
-	socket.on('addVideo', function(id) {
-		videoStore.get(id, function(video) {
-			$scope.addVideo(video);
-		});
-	});
+	// watcher
 
 	$scope.$watch('currentPosition', function() {
 		$scope.currentVideo = $scope.playlist[$scope.currentPosition] || {};
-
-		socket.emit('currentVideo', $scope.currentVideo.id);
 
 		if (!$scope.currentVideo.relatedVideos && $scope.currentVideo.id)
 			videoStore.get($scope.currentVideo.id, function(v) {
@@ -77,7 +71,13 @@ function MainCtrl($scope, videoStore, socket) {
 }
 
 function SearchCtrl($scope, videoStore) {
+
+	// properties
+
 	$scope.searchResults = -1;
+
+
+	// methods
 
 	$scope.search = function(q) {
 		videoStore.search(q, function(result) {
@@ -86,14 +86,42 @@ function SearchCtrl($scope, videoStore) {
 	};
 }
 
-function PlayerCtrl($scope) {
-	
+function RemoteCtrl($scope, socket, guid, videoStore) {
+
+	// properties
+
+	$scope.roomId = guid.get();
+	$scope.socketConnected = false;
+	$scope.appDomain = window.location.host;
+
+	// socket
+
+	socket.emit('init', $scope.roomId, function() {
+		$scope.socketConnected = true;
+	});
+
+	socket.on('addVideo', function(id) {
+		videoStore.get(id, function(video) {
+			$scope.addVideo(video);
+		});
+	});
+
+	// watchers
+
+	$scope.$watch('currentPosition', function() {
+		socket.emit('currentVideo', $scope.currentVideo.id);
+	});
 }
 
 function PlaylistCtrl($scope) {
+
+	// properties
+
 	$scope.totalDuration = 0;
 	$scope.playedDuration = 0;
 	$scope.playlistProgress = 0;
+
+	// watchers
 
 	$scope.$watch('currentPosition', function() {
 		var c = 0;

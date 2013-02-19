@@ -2,6 +2,7 @@ function MainCtrl($scope, socket, videoStore) {
 	$scope.currentVideoId = '';
 	$scope.currentVideo = false;
 	$scope.searchResults = -1;
+	$scope.roomId = document.location.href.match(/\?([\w-]+)$/)[1];
 
 	$scope.search = function(s) {
 		videoStore.search(s, function(result) {
@@ -13,7 +14,7 @@ function MainCtrl($scope, socket, videoStore) {
 		socket.emit('addVideo', v.id);
 	};
 
-	socket.emit('init', 'azerty', function(id) {
+	socket.emit('init', $scope.roomId, function(id) {
 		$scope.currentVideoId = id;
 	});
 
