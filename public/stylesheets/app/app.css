@@ -1390,6 +1390,12 @@
   position: absolute;
   right: -webkit-calc(0% + 15px);
 }
+html,
+body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
 body {
   background: #CCCCCC;
 }
@@ -1404,9 +1410,10 @@ body {
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
   margin: 0;
+  background-color: rgba(255, 255, 255, 0.5);
 }
 .well > .title {
-  background-color: #424242;
+  background-color: rgba(0, 0, 0, 0.6);
   padding: 5px;
   margin: 0;
   height: 40px;
@@ -1584,7 +1591,7 @@ body {
   background: transparent;
 }
 .vertical-video-list li:hover {
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.5);
 }
 .vertical-video-list li .img {
   -moz-box-shadow: 0px 0px 3px 0px #656565;
@@ -1727,6 +1734,7 @@ body {
   width: 20px;
   height: 100%;
   left: 0;
+  top: 5px;
 }
 [scrollable='x'] .viewport {
   height: calc(100% - 10px);
@@ -1738,6 +1746,9 @@ body {
   top: 0;
   height: 100%;
   width: 100000px;
+}
+[scrollable='x'] .viewport ul.overview {
+  padding-right: 30px;
 }
 #remote [qr-code] {
   height: 100%;

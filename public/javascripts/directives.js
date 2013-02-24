@@ -140,3 +140,80 @@ app.directive('qrCode', function() {
 		});
 	};
 });
+
+app.directive('particular', function() {
+	return function(scope, element, attrs) {
+		$el = $(element);
+
+		var elX = $el.innerWidth();
+		var elY = $el.innerHeight();
+
+		var $canvas = $('<canvas height="' + elY + '" width="' + elX + '" />', {
+			height: elY,
+			width: elX
+		}).prependTo($el);
+
+		 var defaultsSettings = {
+	        shape: 'square',
+	        velocity: new Vector({y: -3}),
+	        xVariance: elX / 2,
+	        yVariance: 0,
+	        spawnSpeed: 1,
+	        generations: 100000,
+	        maxParticles: 1000,
+	        size: 30,
+	        sizeVariance: 30,
+	        life: 300,
+	        lifeVariance: 10,    
+	        direction: 0,
+	        directionVariance: 15,
+	        color: '#1B9EE0',
+	        opacity: 0.9,
+	        onDraw: function(p) {
+	          var y = -this.age * 3;
+	          p.size *= 0.999;
+	          p.opacity = 0.8 - (p.age / p.life * 0.7);
+	        },
+            position: new Vector({
+                x: elX / 2,
+                y: elY
+            })
+        };
+
+        var currentSettings = $.extend({}, defaultsSettings);
+
+		var canvas = $canvas.get(0);
+	    particles = new ParticleCanvas(canvas, {
+            x: elX / 2,
+            y: elY / 2
+        });
+	    particles.start();
+
+   		attrs.$observe('particular', function(modifiers) {
+   			modifiers = scope.$eval(modifiers);
+		   
+		   	for (var i in modifiers) {
+		   		(function(exp) {
+		   			scope.$watch(exp, function(expValue) {
+		   				if (modifiers[exp].type == 'change') {
+				   			particles.update($.extend(currentSettings, currentSettings, modifiers[exp].vals));
+
+				   			setTimeout(function() {
+				   				defaultsSettings.position = currentSettings.position;
+				   				particles.update(defaultsSettings);
+				   				currentSettings = $.extend({}, defaultsSettings);
+				   			}, 2000);
+				   		}
+				   		else {
+				   			var val = modifiers[exp].vals[expValue] || modifiers[exp].vals.default;
+				   			$.extend(defaultsSettings, defaultsSettings, val);
+				   			particles.update($.extend(currentSettings, currentSettings, val));
+				   		}
+			   		
+		   			}, true);
+		   		})(i);
+		   	}
+		});
+
+	};
+});

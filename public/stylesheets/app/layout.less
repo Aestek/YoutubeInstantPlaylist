@@ -1,3 +1,9 @@
+html, body {
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
+}
+
 body {
 	background: #CCCCCC;
 }
@@ -8,9 +14,10 @@ body {
 	.shadow(#aaa, 5px);
 	.rounded-corners(0);
 	margin: 0;
+	background-color: rgba(255,255,255, 0.5);
 
 	& > .title {
-		background-color: @mainColor;
+		background-color: rgba(0,0,0, 0.6);
 		padding: 5px;
 		margin: 0;
 		height: @titleHeight;

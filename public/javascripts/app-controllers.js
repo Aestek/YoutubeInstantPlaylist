@@ -9,6 +9,34 @@ function MainCtrl($scope, videoStore) {
 	$scope.currentTime = 0;
 	$scope.playerState = -1;
 
+	$scope.particularModifiers = {
+		playlist: {
+			type: 'change',
+			vals: {
+				color: "#DE3A3A",
+				directionVariance: 50,
+			}
+		}, 
+		currentPosition: {
+			type: 'change',
+			vals: {
+				color: "#9900FF",
+				directionVariance: 50,
+			}
+		}, 
+		playerState: {
+			type: 'val',
+			vals: {
+				1 : {
+					color: '#6FB827',
+				},
+				default: {
+					color: '#1B9EE0',
+				}
+			}
+		}
+	};
+
 	// methods
 
 	$scope.addVideo = function(v) {
@@ -21,8 +49,14 @@ function MainCtrl($scope, videoStore) {
 	};
 
 	$scope.setIndex = function(i) {
-		if (i < $scope.playlist.length && i >= 0)
+		if (i < $scope.playlist.length && i >= 0) {
 			$scope.currentPosition = i;
+
+			for (var j in $scope.playlist)
+				$scope.playlist[j].playing = false;
+
+			$scope.playlist[i].playing = true;
+		}
 	};
 
 	$scope.removeAt = function(i) {
@@ -137,9 +171,15 @@ function PlaylistCtrl($scope) {
 
 	$scope.$watch('playlist', function() {
 		var t = 0;
-		for (var i in $scope.playlist)
+		for (var i in $scope.playlist) {
 			t += $scope.playlist[i].duration;
+
+			if ($scope.playlist[i].playing)
+				$scope.currentPosition = parseInt(i);
+		}
+
 		$scope.totalDuration = t;
+
 	}, true);
 
 	$scope.$watch('currentTime', function() {
