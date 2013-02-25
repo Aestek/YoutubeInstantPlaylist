@@ -130,7 +130,7 @@ ParticleGenerator.prototype = {
     // Check to see if we've reached the max # of generation cycles
     if(this.options.generations != -1 && this.age <= this.options.generations) {
       if(this.particles.length == 0 && this.options.generations <= this.age) this.active = false;
-      this.age++;
+      //this.age++;
     }
   
     // Update any existing particles; check for dead particles
@@ -162,7 +162,6 @@ ParticleGenerator.prototype = {
 };
 
 var Particle = function(options) {
-  
   // output a random variance number
   var rand = function(num) { return (Math.random() * num << 1) - num; };
   
@@ -172,6 +171,11 @@ var Particle = function(options) {
   // Set the initial particle directional heading
   var direction = options.direction + rand(options.directionVariance);
   
+  options.position = new Vector({
+  	x: options.position.x,
+  	y: options.position.y
+  });
+
   extend(this, options, {
     p: options.position.clone().add(position),
     v: options.velocity.clone().rotate(direction * Math.PI/180),
@@ -180,6 +184,8 @@ var Particle = function(options) {
     size: options.size + rand(options.sizeVariance),
     active: true
   });
+
+  this.rotation = Math.random() * 45;
   
   return this;  
 };
@@ -202,9 +208,12 @@ Particle.prototype = {
       console.debug(ex); 
     }
     ctx.translate(this.p.x, this.p.y);
+
+    this.rotation++;
     
     switch(this.shape) {
       case 'square':
+      	ctx.rotate(this.rotation * Math.PI/180);
         ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
       break;
       case 'circle':

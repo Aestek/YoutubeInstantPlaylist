@@ -145,13 +145,24 @@ app.directive('particular', function() {
 	return function(scope, element, attrs) {
 		$el = $(element);
 
-		var elX = $el.innerWidth();
-		var elY = $el.innerHeight();
+		function setSize() {
+			elX = $el.innerWidth();
+			elY = $el.innerHeight();
 
-		var $canvas = $('<canvas height="' + elY + '" width="' + elX + '" />', {
-			height: elY,
-			width: elX
-		}).prependTo($el);
+			$canvas.css({
+				height: elY,
+				width: elX
+			})
+		}
+
+		elX = $el.innerWidth();
+		elY = $el.innerHeight();
+
+		var $canvas = $('<canvas height="' + elY + '" width="' + elX + '" />').prependTo($el);
+		setSize();
+		$(window).resize(function() {
+			setSize();
+		});
 
 		 var defaultsSettings = {
 	        shape: 'square',
@@ -159,7 +170,7 @@ app.directive('particular', function() {
 	        xVariance: elX / 2,
 	        yVariance: 0,
 	        spawnSpeed: 1,
-	        generations: 100000,
+	        generations: 1,
 	        maxParticles: 1000,
 	        size: 30,
 	        sizeVariance: 30,
@@ -194,20 +205,23 @@ app.directive('particular', function() {
 		   
 		   	for (var i in modifiers) {
 		   		(function(exp) {
-		   			scope.$watch(exp, function(expValue) {
+		   			var currentValParams;
+		   			scope.$watch(exp, function(expValue, oldExpValue) {
 		   				if (modifiers[exp].type == 'change') {
 				   			particles.update($.extend(currentSettings, currentSettings, modifiers[exp].vals));
 
 				   			setTimeout(function() {
-				   				defaultsSettings.position = currentSettings.position;
 				   				particles.update(defaultsSettings);
 				   				currentSettings = $.extend({}, defaultsSettings);
-				   			}, 2000);
+				   			}, 1000);
 				   		}
 				   		else {
 				   			var val = modifiers[exp].vals[expValue] || modifiers[exp].vals.default;
-				   			$.extend(defaultsSettings, defaultsSettings, val);
-				   			particles.update($.extend(currentSettings, currentSettings, val));
+				   			if (!angular.equals(val, currentValParams)) {
+					   			$.extend(defaultsSettings, defaultsSettings, val);
+					   			particles.update($.extend(currentSettings, currentSettings, val));
+					   			currentValParams = val;
+					   		}
 				   		}
 			   		
 		   			}, true);

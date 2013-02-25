@@ -1453,6 +1453,10 @@ body {
   border: 0 !important;
   color: white;
 }
+hr {
+  border-top-color: rgba(0, 0, 0, 0.1);
+  border-bottom-color: rgba(255, 255, 255, 0.2);
+}
 .block-content {
   position: relative;
   -ms-box-sizing: border-box;

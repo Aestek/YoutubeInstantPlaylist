@@ -15,13 +15,13 @@ function MainCtrl($scope, videoStore) {
 			vals: {
 				color: "#DE3A3A",
 				directionVariance: 50,
-			}
-		}, 
-		currentPosition: {
-			type: 'change',
-			vals: {
-				color: "#9900FF",
-				directionVariance: 50,
+				position: {
+					x: $(window).innerWidth() / 2,
+					y: $(window).innerHeight() / 2
+				},
+				xVariance: 0,
+				directionVariance : 1000,
+				velocity: -10
 			}
 		}, 
 		playerState: {
@@ -69,11 +69,11 @@ function MainCtrl($scope, videoStore) {
 		var pLength = $scope.playlist.length;
 
 		if (pLength == 0)
-			$scope.currentPosition = -1;
+			$scope.setIndex(-1);
 		else if (i > pLength -1)
-			$scope.currentPosition = pLength - 1;
+			$scope.setIndex(pLength - 1);
 		else if (i < $scope.currentPosition)
-			$scope.currentPosition--;
+			$scope.setIndex($scope.currentPosition - 1);
 	};
 
 	$scope.removeAll = function() {
@@ -92,11 +92,13 @@ function MainCtrl($scope, videoStore) {
 				$scope.currentVideo = v;
 			});
 
+		console.log($scope.currentVideo.id)
+
 	});
 
 	$scope.$watch('playerState', function() {
 		if ($scope.playerState == 0 && $scope.currentPosition < $scope.playlist.length -1)
-			$scope.currentPosition++;
+			$scope.setIndex($scope.currentPosition + 1);
 	});
 
 	$scope.$watch('currentTime', function() {
@@ -165,24 +167,30 @@ function PlaylistCtrl($scope) {
 			else
 				break;
 		}
-
+		console.log($scope.currentPosition)
 		$scope.playedDuration = c;
 	});
 
 	$scope.$watch('playlist', function() {
 		var t = 0;
+		var found = false;
 		for (var i in $scope.playlist) {
 			t += $scope.playlist[i].duration;
 
-			if ($scope.playlist[i].playing)
+			if ($scope.playlist[i].playing) {
 				$scope.currentPosition = parseInt(i);
+				found = true;
+			}
 		}
+
+		if (!found)
+			$scope.currentPosition = -1;
 
 		$scope.totalDuration = t;
 
 	}, true);
 
-	$scope.$watch('currentTime', function() {
+	$scope.$watch('currentTime + " " + playerState', function() {
 		if ($scope.totalDuration > 0)
 			$scope.playlistProgress = ($scope.playedDuration + $scope.currentTime) / $scope.totalDuration * 100;
 		else
