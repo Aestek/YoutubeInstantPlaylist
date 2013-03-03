@@ -43,18 +43,22 @@ app.directive('youtubePlayer', function() {
 
 			// YoutubePlayer requires a video id to load
 		    var att = { 
-		    	data: 'http://www.youtube.com/v/K-aERDSzU10?enablejsapi=1&playerapiid=' + container,
+		    	data: 'http://www.youtube.com/v/K-aERDSzU10?enablejsapi=1&autohide=1&color=white&controls=2&modestbranding=0&rel=0&playerapiid=' + container,
 		    	width: '100%', 
 		    	height: '100%' 
 		    };
 		    var par = { 
 		    	allowScriptAccess: 'always', 
-		    	wmode: 'transparent' 
+		    	wmode: 'transparent',
+		    	allowfullscreen: true
 		    };
 
 		    function switchPlayerVisibility(v) {
-		    	var vis = v ? 'visible' : 'hidden';
-		    	$(document.getElementById(container)).css('visibility', vis);
+		    	var e = $(document.getElementById(container)).parent();
+		    	if (v)
+		    		e.removeClass('hidden');
+		    	else
+		    		e.addClass('hidden');
 		    }
 
 		    onYouTubePlayerReady = function(id) {
@@ -171,7 +175,7 @@ app.directive('particular', function() {
 	        yVariance: 0,
 	        spawnSpeed: 1,
 	        generations: 1,
-	        maxParticles: 1000,
+	        maxParticles: 200,
 	        size: 30,
 	        sizeVariance: 30,
 	        life: 300,
@@ -183,7 +187,7 @@ app.directive('particular', function() {
 	        onDraw: function(p) {
 	          var y = -this.age * 3;
 	          p.size *= 0.999;
-	          p.opacity = 0.8 - (p.age / p.life * 0.7);
+	          p.opacity = 0.6 - (p.age / p.life * 0.5);
 	        },
             position: new Vector({
                 x: elX / 2,
@@ -199,6 +203,7 @@ app.directive('particular', function() {
             y: elY / 2
         });
 	    particles.start();
+	    particles.update(currentSettings);
 
    		attrs.$observe('particular', function(modifiers) {
    			modifiers = scope.$eval(modifiers);
@@ -206,23 +211,28 @@ app.directive('particular', function() {
 		   	for (var i in modifiers) {
 		   		(function(exp) {
 		   			var currentValParams;
+		   			var inited = false;
 		   			scope.$watch(exp, function(expValue, oldExpValue) {
-		   				if (modifiers[exp].type == 'change') {
-				   			particles.update($.extend(currentSettings, currentSettings, modifiers[exp].vals));
+		   				if (inited) {
+			   				if (modifiers[exp].type == 'change') {
+					   			particles.update($.extend(currentSettings, currentSettings, modifiers[exp].vals));
 
-				   			setTimeout(function() {
-				   				particles.update(defaultsSettings);
-				   				currentSettings = $.extend({}, defaultsSettings);
-				   			}, 1000);
-				   		}
-				   		else {
-				   			var val = modifiers[exp].vals[expValue] || modifiers[exp].vals.default;
-				   			if (!angular.equals(val, currentValParams)) {
-					   			$.extend(defaultsSettings, defaultsSettings, val);
-					   			particles.update($.extend(currentSettings, currentSettings, val));
-					   			currentValParams = val;
+					   			setTimeout(function() {
+					   				particles.update(defaultsSettings);
+					   				currentSettings = $.extend({}, defaultsSettings);
+					   			}, 1000);
 					   		}
-				   		}
+					   		else {
+					   			var val = modifiers[exp].vals[expValue] || modifiers[exp].vals.default;
+					   			if (!angular.equals(val, currentValParams)) {
+						   			$.extend(defaultsSettings, defaultsSettings, val);
+						   			particles.update($.extend(currentSettings, currentSettings, val));
+						   			currentValParams = val;
+						   		}
+					   		}
+					   	}
+					   	else
+					   		inited = true;
 			   		
 		   			}, true);
 		   		})(i);
@@ -231,3 +241,70 @@ app.directive('particular', function() {
 
 	};
 });
+
+
+app.directive('bsTypeahead', ['$parse', function($parse) {
+	'use strict';
+
+	return {
+		restrict: 'A',
+		require: '?ngModel',
+		link: function postLink(scope, element, attrs, controller) {
+
+			var getter = $parse(attrs.bsTypeahead),
+					setter = getter.assign,
+					value = getter(scope),
+					updater = $parse(attrs.bsTypeaheadUpdater)(scope);
+
+			// Watch bsTypeahead for changes
+			scope.$watch(attrs.bsTypeahead, function(newValue, oldValue) {
+				if(newValue !== oldValue) {
+					value = newValue;
+				}
+			});
+
+			element.attr('data-provide', 'typeahead');
+			element.typeahead({
+				source: function(query) { return angular.isFunction(value) ? value.apply(null, arguments) : value; },
+				minLength: attrs.minLength || 1,
+				items: attrs.items,
+				updater: function(value) {
+					// If we have a controller (i.e. ngModelController) then wire it up
+					if(controller) {
+						scope.$apply(function () {
+							controller.$setViewValue(value);
+							updater.apply(null, [value]);
+						});
+					}
+					if (updater)
+						
+					return value;
+				}
+			});
+
+			// Bootstrap override
+			var typeahead = element.data('typeahead');
+			// Fixes #2043: allows minLength of zero to enable show all for typeahead
+			typeahead.lookup = function (ev) {
+				var items;
+				this.query = this.$element.val() || '';
+				if (this.query.length < this.options.minLength) {
+					return this.shown ? this.hide() : this;
+				}
+				items = $.isFunction(this.source) ? this.source(this.query, $.proxy(this.process, this)) : this.source;
+				return items ? this.process(items) : this;
+			};
+
+			// Support 0-minLength
+			if(attrs.minLength === "0") {
+				setTimeout(function() { // Push to the event loop to make sure element.typeahead is defined (breaks tests otherwise)
+					element.on('focus', function() {
+						setTimeout(element.typeahead.bind(element, 'lookup'), 200);
+					});
+				});
+			}
+
+		}
+	};
+
+}]);

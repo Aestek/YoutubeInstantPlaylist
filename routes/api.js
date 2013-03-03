@@ -21,8 +21,7 @@ exports.video = function(req, res) {
 	var id = req.route.params.id;
 	async.map([
 		'http://gdata.youtube.com/feeds/api/videos/'+ id +'?v=2&alt=jsonc',
-		'http://gdata.youtube.com/feeds/api/videos/' + id + '/related?v=2&alt=jsonc',
-		'http://gdata.youtube.com/feeds/api/videos/'+ id +'/comments?alt=json'
+		'http://gdata.youtube.com/feeds/api/videos/' + id + '/related?v=2&alt=jsonc'
 	], fetch, function(err, results) {
 		if (err) {
 			res.send(400);
@@ -56,4 +55,27 @@ exports.search = function(req, res) {
 			res.send(200, o.data);
 		}
 	);
-}
+};
+
+exports.searchAutocomplete = function(req, res) {
+	var q = req.query.q;
+	request(
+		{uri: 'http://suggestqueries.google.com/complete/search?client=youtube&ds=yt&q=' + encodeURIComponent(q)},
+		function (error, response, body) {
+			try {
+				var r = body.match(/^window\.google\.ac\.h\((.+)\)$/)[1];
+				var ro = JSON.parse(r);
+				var l = [];
+
+				for (var i in ro[1]) {
+					l.push(ro[1][i][0]);
+				}
+
+				res.send(200, l);
+			}
+			catch (err) {
+				res.send(400, err);
+			}
+		}
+	);
+};

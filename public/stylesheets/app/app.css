@@ -1,3 +1,4 @@
+@import url(http://fonts.googleapis.com/css?family=Handlee);
 .row1,
 .rowoffset0.row1 {
   top: -webkit-calc(0% + 15px);
@@ -1428,30 +1429,14 @@ body {
   color: white;
   border: 0;
 }
+.well > .title.search-youtube {
+  background-image: url('/images/yt-favicon.ico');
+  background-position: 8px 50%;
+  background-repeat: no-repeat;
+  padding-left: 30px;
+}
 .well input.title {
   text-align: left;
-}
-.nav-tabs {
-  margin: 0;
-}
-.nav-tabs li {
-  border-radius: 0;
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  border: 0;
-  background: #424242;
-  height: 40px;
-}
-.nav-tabs li.active {
-  background: #f5f5f5;
-}
-.nav-tabs li.active a {
-  color: #424242;
-}
-.nav-tabs li a {
-  background-color: transparent !important;
-  border: 0 !important;
-  color: white;
 }
 hr {
   border-top-color: rgba(0, 0, 0, 0.1);
@@ -1469,11 +1454,12 @@ hr {
 .block-content .no-content {
   width: 100%;
   text-align: center;
-  font-size: large;
+  font-size: xx-large;
   position: absolute;
-  line-height: 20px;
+  line-height: 30px;
   top: 50%;
-  margin-top: -10px;
+  margin-top: -15px;
+  font-family: 'Handlee', cursive;
 }
 .block-padding {
   padding: 7px;
@@ -1481,6 +1467,12 @@ hr {
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
+}
+.player-container {
+  background-color: black;
+}
+.player-container.hidden {
+  visibility: hidden;
 }
 .horizontal-video-list {
   list-style-type: none;
@@ -1540,7 +1532,7 @@ hr {
 }
 .horizontal-video-list li .img .duration {
   position: absolute;
-  right: 3px;
+  left: 80px;
   bottom: 3px;
   border-radius: 2px;
   -webkit-border-radius: 2px;
@@ -1549,6 +1541,13 @@ hr {
   color: white;
   font-size: x-small;
   padding: 0px 5px;
+}
+.horizontal-video-list li .img .addedBy {
+  height: 50px;
+  width: 50px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
 }
 .horizontal-video-list li .img .playlist-id {
   position: absolute;
@@ -1754,12 +1753,30 @@ hr {
 [scrollable='x'] .viewport ul.overview {
   padding-right: 30px;
 }
-#remote [qr-code] {
-  height: 100%;
+[qr-code] {
   font-weight: bold;
+  text-align: center;
 }
-#remote [qr-code] canvas {
+[qr-code] canvas {
   height: 100%;
   float: left;
-  margin-right: 5px;
+  margin-right: 10px;
+}
+.remote-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+.remote-list li {
+  height: 50px;
+  line-height: 50px;
+  padding-left: 10px;
+}
+#added-by {
+  bakground-size: cover;
+  background-position: 50% 50%;
+}
+.added-by-picture {
+  float: right;
+  margin: 0 0 10px 10px;
 }

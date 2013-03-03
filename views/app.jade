@@ -10,6 +10,7 @@ html(lang='en', ng-app='app')
 		script(src='lib/jquery/jquery-1.7.1.min.js', type='text/javascript')
 		script(src='lib/jquery/jquery-ui-1.8.21.custom.min.js', type='text/javascript')
 		script(src='lib/jquery/jquery-ui-sortables-custom.js', type='text/javascript')
+		script(src='lib/bootstrap/js/bootstrap.min.js', type='text/javascript')
 		script(src='lib/angular.min.js', type='text/javascript')
 		script(src='lib/angular-ui/angular-ui.js', type='text/javascript')
 		script(src='lib/jquery.tinyscrollbar.min.js', type='text/javascript')
@@ -17,7 +18,6 @@ html(lang='en', ng-app='app')
 		script(src='lib/particle.js', type='text/javascript')
 		script(src='/socket.io/socket.io.js', type='text/javascript')
 		script(src='lib/jquery.qrcode.js', type='text/javascript')
-		// script(src='javascripts/canvas.js')
 
 		script(src='javascripts/app.js', type='text/javascript')
 		script(src='javascripts/services.js', type='text/javascript')
@@ -26,20 +26,24 @@ html(lang='en', ng-app='app')
 		script(src='javascripts/filters.js', type='text/javascript')
 
 
-	body(ng-controller='MainCtrl', particular='{{particularModifiers}}')
+	body(ng-controller='MainCtrl')
 
 		// search
 		.well.row12.col5(ng-controller='SearchCtrl')
-			input.title(
+			input.search-youtube.title(
 				type='text', 
 				placeholder='Search Youtube', 
 				ng-model='searchQuery',
-				ui-keypress='{13: \'search(searchQuery)\'}'
+				ui-keypress='{13: \'search(searchQuery)\'}',
+				bs-typeahead='findAutocomplete',
+				bs-typeahead-updater='search'
 			)
 	
 			.block-content
 				.no-content(ng-show='searchResults.length == 0') Your search yieled no result
-				.no-content(ng-show='searchResults == -1') Search videos to add in your playlist
+				.no-content(ng-show='searchResults == -1') &uarr; 
+					br
+					| Search videos to add in your playlist
 				div(scrollable='y', scroll-bind='searchResults')
 					.scrollbar
 						.track
@@ -73,41 +77,60 @@ html(lang='en', ng-app='app')
 			.block-content
 				.no-content(ng-show='!currentVideo.id') Select a video to play
 
+				.player-container
+					div(
+						youtube-player, 
+						video='currentVideo', 
+						current-time='currentTime',
+						player-state='playerState'
+					)
+		// remote
+
+		#remote(ng-controller='RemoteCtrl')
+			.well.col4.coloffset12.row2
+				//.title Added by
+
+				#added-by.block-content.block-padding
+					img.added-by-picture(
+						src='https://graph.facebook.com/{{currentAddedBy.id}}/picture',
+						ng-show='currentAddedBy.id'
+					)
+					| This video was added by 
+					a {{currentAddedBy.displayName || 'you'}}
+					|  to the playlist
+
+			.well.col4.coloffset12.row3.rowoffset2
 				div(
-					youtube-player, 
-					video='currentVideo', 
-					current-time='currentTime',
-					player-state='playerState'
-				)
+					qr-code='http://{{appDomain}}/remote?k={{roomId}}', 
+					width='1000', 
+					height='1000',
+					fgcolor='#424242', 
+					bgcolor='transparent'
+				) 
+				p.block-padding Scan this qrcode to control the player with your phone !
 
-		// infos
-		.well.col4.coloffset12.row6
-			#video-top-infos.block-padding
-				strong Added by : 
-				| {{currentVideo.uploader}}
-				br
-				strong On : 
-				| {{currentVideo.uploaded | date:'medium'}}
-				hr
-			#video-description(scrollable='y', scroll-bind='currentVideo.description')
-				.scrollbar
-					.track
-						.thumb
+			.well.col4.coloffset12.row4.rowoffset5
+				.title Connected remotes
+				.block-content(scrollable='y', scroll-bind='connectedRemotes')
+					.scrollbar
+						.track
+							.thumb
 
-				.viewport
-					.overview.block-padding(ng-bind-html-unsafe='currentVideo.description | formatText')
+					.viewport
+						.overview
+							ul.remote-list
+								li(
+									ng-repeat='remote in connectedRemotes'
+								)
+									img.pull-right(
+										ng-src='https://graph.facebook.com/{{remote.id}}/picture',
+										ng-show='remote.id'
+									)
+									| {{remote.displayName}}
+
 
 		
-		// remote
-		#remote.well.col4.coloffset12.row3.rowoffset6(ng-controller='RemoteCtrl')
-			div(
-				qr-code='http://{{appDomain}}/remote?{{roomId}}', 
-				width='500', 
-				height='500',
-				fgcolor='#424242', 
-				bgcolor='transparent'
-			) 
-				| Scan this qrcode to control the player with your phone !
+			
 		
 		// related 
 		.col11.coloffset5.row3.rowoffset9
@@ -157,7 +180,7 @@ html(lang='en', ng-app='app')
 						i.icon-step-forward
 
 			.block-content
-				div.no-content(ng-show='playlist.length == 0') Your playlist is currently empty
+				div.no-content(ng-show='playlist.length == 0') Your playlist is currently empty :(
 				div(scrollable='x', scroll-bind='playlist')
 					.viewport
 						ul.horizontal-video-list.overview(
@@ -166,23 +189,26 @@ html(lang='en', ng-app='app')
 							ng-model='playlist'
 						)
 							li(
-								ng-repeat='video in playlist', 
+								ng-repeat='item in playlist', 
 								ng-click='setIndex($index)',
-								ng-class='(currentPosition == $index) && "playing"',
+								ng-class='(currentPosition == $index) && "playing"'
 							)
-								.img(back-img='{{video.thumbnail.hqDefault}}')
-									.title-container {{video.title}}
+								.img(back-img='{{item.video.thumbnail.hqDefault}}')
+									.title-container {{item.video.title}}
 
 									.buttons
 										button.btn.btn-danger(ng-click='removeAt($index)')
 											i.icon-remove-sign.icon-white
 
-									.duration {{video.duration | secToTime}}
+									.duration {{item.video.duration | secToTime}}
+
+									.addedBy(
+										ng-show='item.addedBy', 
+										back-img='https://graph.facebook.com/{{item.addedBy.id}}/picture'
+									)
 
 									.playlist-id {{$index + 1}}
 
 					.scrollbar
 						.track
 							.thumb
-			#playlistBar
-				div

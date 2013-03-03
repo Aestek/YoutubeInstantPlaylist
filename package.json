@@ -11,6 +11,10 @@
     "less-middleware": "*",
     "request": "*",
     "async": "*",
-    "socket.io" : "0.9"
+    "socket.io" : "0.9",
+    "passport" : "*",
+    "passport-facebook": "*",
+    "connect": "*",
+    "cookie": "*"
   }
 }

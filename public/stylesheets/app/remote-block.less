@@ -1,12 +1,33 @@
-#remote {
-	[qr-code] {
-		height: 100%;
-		font-weight: bold;
+[qr-code] {
+	font-weight: bold;
+	text-align: center;
 
-		canvas {
-			height: 100%;
-			float: left;
-			margin-right: 5px;
-		}
+	canvas {
+		height: 100%;
+		float: left;
+		margin-right: 10px;
+		//margin: 0 auto;
 	}
+}
+
+.remote-list {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+
+	li {
+		height: 50px;
+		line-height: 50px;
+		padding-left: 10px;
+	}
+}
+
+#added-by {
+	bakground-size: cover;
+	background-position: 50% 50%;
+}
+
+.added-by-picture {
+	float: right;
+	margin: 0 0 10px 10px;
 }

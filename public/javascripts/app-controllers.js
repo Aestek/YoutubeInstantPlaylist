@@ -39,9 +39,12 @@ function MainCtrl($scope, videoStore) {
 
 	// methods
 
-	$scope.addVideo = function(v) {
-		if (($scope.playlist[$scope.playlist.length -1] || {}).id != v.id) {
-			var i = $scope.playlist.push(v) - 1;
+	$scope.addVideo = function(v, user) {
+		if ((($scope.playlist[$scope.playlist.length -1] || {}).video || {}).id != v.id) {
+			var i = $scope.playlist.push({
+				video: v,
+				addedBy: user
+			}) - 1;
 			if (i == 0)
 				$scope.setIndex(0);
 			return i;
@@ -85,15 +88,13 @@ function MainCtrl($scope, videoStore) {
 	// watcher
 
 	$scope.$watch('currentPosition', function() {
-		$scope.currentVideo = $scope.playlist[$scope.currentPosition] || {};
+		$scope.currentVideo = ($scope.playlist[$scope.currentPosition] || {}).video || {};
+		$scope.currentAddedBy = ($scope.playlist[$scope.currentPosition] || {}).addedBy;
 
 		if (!$scope.currentVideo.relatedVideos && $scope.currentVideo.id)
 			videoStore.get($scope.currentVideo.id, function(v) {
 				$scope.currentVideo = v;
 			});
-
-		console.log($scope.currentVideo.id)
-
 	});
 
 	$scope.$watch('playerState', function() {
@@ -116,8 +117,15 @@ function SearchCtrl($scope, videoStore) {
 	// methods
 
 	$scope.search = function(q) {
+		console.log('sss')
 		videoStore.search(q, function(result) {
 			$scope.searchResults = result.items || [];
+		});
+	};
+
+	$scope.findAutocomplete = function(q, cb) {
+		videoStore.searchAutocomplete(q, function(result) {
+			cb(result);
 		});
 	};
 }
@@ -126,20 +134,28 @@ function RemoteCtrl($scope, socket, guid, videoStore) {
 
 	// properties
 
-	$scope.roomId = guid.get();
+	$scope.roomId = 'aaa' //guid.get();
 	$scope.socketConnected = false;
 	$scope.appDomain = window.location.host;
+	$scope.connectedRemotes = [];
 
 	// socket
 
-	socket.emit('init', $scope.roomId, function() {
+	socket.emit('init', {
+		key: $scope.roomId, 
+		type: 'player'
+	}, function() {
 		$scope.socketConnected = true;
 	});
 
-	socket.on('addVideo', function(id) {
-		videoStore.get(id, function(video) {
-			$scope.addVideo(video);
-		});
+	socket.on('addVideo', function(o) {
+		$scope.addVideo(o.video, o.addedBy);
+		console.log(o.addedBy);
+	});
+
+	socket.on('remotes', function(remotes) {
+		console.log(remotes)
+		$scope.connectedRemotes = remotes;
 	});
 
 	// watchers
@@ -163,11 +179,11 @@ function PlaylistCtrl($scope) {
 		var c = 0;
 		for (var i in $scope.playlist) {
 			if (i < $scope.currentPosition)
-				c += $scope.playlist[i].duration;
+				c += $scope.playlist[i].video.duration;
 			else
 				break;
 		}
-		console.log($scope.currentPosition)
+
 		$scope.playedDuration = c;
 	});
 

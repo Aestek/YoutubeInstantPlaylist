@@ -3,7 +3,8 @@
 app.factory('videoStore', function($http, $cacheFactory) {
 	var caches = {
 		video : $cacheFactory('video'),
-		search : $cacheFactory('search')
+		search : $cacheFactory('search'),
+		searchAutocomplete: $cacheFactory('searchAutocomplete')
 	};
 
 	function getCacheGeneric(type, id, fallback, callback) {
@@ -23,6 +24,19 @@ app.factory('videoStore', function($http, $cacheFactory) {
 		search: function(q, callback) {
 			getCacheGeneric('search', q, function(fn) {
 				$http.get('/api/search/', {
+					params: {
+						q: q
+					}
+				}).success(function(data) {
+					fn(data);
+				});
+			}, function(e) {
+				callback(e);
+			});
+		},
+		searchAutocomplete: function(q, callback) {
+			getCacheGeneric('searchAutocomplete', q, function(fn) {
+				$http.get('/api/search-autocomplete/', {
 					params: {
 						q: q
 					}
