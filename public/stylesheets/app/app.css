@@ -1396,6 +1396,9 @@ body {
   height: 100%;
   width: 100%;
   overflow: hidden;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
 body {
   background: #CCCCCC;
@@ -1454,7 +1457,7 @@ hr {
 .block-content .no-content {
   width: 100%;
   text-align: center;
-  font-size: xx-large;
+  font-size: x-large;
   position: absolute;
   line-height: 30px;
   top: 50%;

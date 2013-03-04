@@ -8,6 +8,7 @@ function MainCtrl($scope, videoStore) {
 	$scope.currentVideoProgress = 0;
 	$scope.currentTime = 0;
 	$scope.playerState = -1;
+	$scope.scrollPlaylistTo = function() {};
 
 	$scope.particularModifiers = {
 		playlist: {
@@ -47,19 +48,19 @@ function MainCtrl($scope, videoStore) {
 			}) - 1;
 			if (i == 0)
 				$scope.setIndex(0);
+			$scope.scrollPlaylistTo('bottom');
+
 			return i;
 		}
 	};
 
 	$scope.setIndex = function(i) {
+		console.log('Setting index', i)
 		if (i < $scope.playlist.length && i >= 0) {
 			$scope.currentPosition = i;
-
-			for (var j in $scope.playlist)
-				$scope.playlist[j].playing = false;
-
-			$scope.playlist[i].playing = true;
 		}
+		else
+			$scope.currentPosition = -1;
 	};
 
 	$scope.removeAt = function(i) {
@@ -88,6 +89,9 @@ function MainCtrl($scope, videoStore) {
 	// watcher
 
 	$scope.$watch('currentPosition', function() {
+
+		console.log('currentPosition', $scope.currentPosition)
+
 		$scope.currentVideo = ($scope.playlist[$scope.currentPosition] || {}).video || {};
 		$scope.currentAddedBy = ($scope.playlist[$scope.currentPosition] || {}).addedBy;
 
@@ -95,16 +99,37 @@ function MainCtrl($scope, videoStore) {
 			videoStore.get($scope.currentVideo.id, function(v) {
 				$scope.currentVideo = v;
 			});
+
+		for (var j in $scope.playlist)
+			$scope.playlist[j].playing = false;
+
+		if ($scope.playlist[$scope.currentPosition])
+			$scope.playlist[$scope.currentPosition].playing = true;
 	});
 
 	$scope.$watch('playerState', function() {
-		if ($scope.playerState == 0 && $scope.currentPosition < $scope.playlist.length -1)
+		if ($scope.playerState == 0)
 			$scope.setIndex($scope.currentPosition + 1);
+
+		console.log('playerState', $scope.playerState)
 	});
 
 	$scope.$watch('currentTime', function() {
 		$scope.currentVideoProgress = $scope.currentTime / $scope.currentVideo.duration * 100;
 	});
+
+	$scope.$watch('playlist', function() {
+		var found = false;
+		for (var i in $scope.playlist) {
+			if ($scope.playlist[i].playing) {
+				$scope.setIndex(parseInt(i));
+				found = true;
+			}
+		}
+
+		if (!found)
+			$scope.currentPosition = $scope.setIndex(-1);
+	}, true);
 }
 
 function SearchCtrl($scope, videoStore) {
@@ -117,7 +142,6 @@ function SearchCtrl($scope, videoStore) {
 	// methods
 
 	$scope.search = function(q) {
-		console.log('sss')
 		videoStore.search(q, function(result) {
 			$scope.searchResults = result.items || [];
 		});
@@ -150,18 +174,16 @@ function RemoteCtrl($scope, socket, guid, videoStore) {
 
 	socket.on('addVideo', function(o) {
 		$scope.addVideo(o.video, o.addedBy);
-		console.log(o.addedBy);
 	});
 
 	socket.on('remotes', function(remotes) {
-		console.log(remotes)
 		$scope.connectedRemotes = remotes;
 	});
 
 	// watchers
 
 	$scope.$watch('currentPosition', function() {
-		socket.emit('currentVideo', $scope.currentVideo.id);
+		socket.emit('currentVideo', $scope.currentVideo);
 	});
 }
 
@@ -176,6 +198,7 @@ function PlaylistCtrl($scope) {
 	// watchers
 
 	$scope.$watch('currentPosition', function() {
+		console.log('currentPosition playlist', $scope.currentPosition)
 		var c = 0;
 		for (var i in $scope.playlist) {
 			if (i < $scope.currentPosition)
@@ -191,17 +214,8 @@ function PlaylistCtrl($scope) {
 		var t = 0;
 		var found = false;
 		for (var i in $scope.playlist) {
-			t += $scope.playlist[i].duration;
-
-			if ($scope.playlist[i].playing) {
-				$scope.currentPosition = parseInt(i);
-				found = true;
-			}
+			t += $scope.playlist[i].video.duration;
 		}
-
-		if (!found)
-			$scope.currentPosition = -1;
-
 		$scope.totalDuration = t;
 
 	}, true);

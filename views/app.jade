@@ -77,7 +77,7 @@ html(lang='en', ng-app='app')
 			.block-content
 				.no-content(ng-show='!currentVideo.id') Select a video to play
 
-				.player-container
+				.player-container.hidden
 					div(
 						youtube-player, 
 						video='currentVideo', 
@@ -91,13 +91,20 @@ html(lang='en', ng-app='app')
 				//.title Added by
 
 				#added-by.block-content.block-padding
-					img.added-by-picture(
-						src='https://graph.facebook.com/{{currentAddedBy.id}}/picture',
-						ng-show='currentAddedBy.id'
-					)
-					| This video was added by 
-					a {{currentAddedBy.displayName || 'you'}}
-					|  to the playlist
+					div(ui-if='currentAddedBy')
+						img.added-by-picture(
+							ng-src='https://graph.facebook.com/{{currentAddedBy.id}}/picture',
+							ng-show='currentAddedBy.id'
+						)
+						| This video was added by 
+						a {{currentAddedBy.displayName}}
+						|  to the playlist
+					duv(ui-if='!currentAddedBy')
+						strong Uploaded by : 
+						| {{currentVideo.uploader}}
+						br
+						strong On : 
+						| {{currentVideo.uploaded | date:'medium'}}
 
 			.well.col4.coloffset12.row3.rowoffset2
 				div(
@@ -110,8 +117,9 @@ html(lang='en', ng-app='app')
 				p.block-padding Scan this qrcode to control the player with your phone !
 
 			.well.col4.coloffset12.row4.rowoffset5
-				.title Connected remotes
+				.title Connected remotes ({{connectedRemotes.length}})
 				.block-content(scrollable='y', scroll-bind='connectedRemotes')
+					.no-content(ng-show='connectedRemotes.length == 0') Nobody's connected
 					.scrollbar
 						.track
 							.thumb
@@ -163,7 +171,10 @@ html(lang='en', ng-app='app')
 				#playlistPosition {{currentPosition + 1}}/{{playlist.length}}
 				#playlistTime {{playedDuration + currentTime | secToTime}} / {{totalDuration | secToTime}}
 
-				button.btn.btn-danger.pull-right(ng-click='removeAll()')
+				button.btn.btn-danger.pull-right(
+					ng-click='removeAll()',
+					ng-disabled='playlist.length == 0'
+				)
 					i.icon-remove-sign.icon-white
 					|  Clear
 
@@ -180,8 +191,13 @@ html(lang='en', ng-app='app')
 						i.icon-step-forward
 
 			.block-content
-				div.no-content(ng-show='playlist.length == 0') Your playlist is currently empty :(
-				div(scrollable='x', scroll-bind='playlist')
+				div.no-content(ng-show='playlist.length == 0') Your playlist is empty :(
+				div(
+					scrollable='x', 
+					scroll-bind='playlist',
+					default-update='relative',
+					scroll-to='scrollPlaylistTo'
+				)
 					.viewport
 						ul.horizontal-video-list.overview(
 							ui-sortable,
@@ -203,7 +219,7 @@ html(lang='en', ng-app='app')
 									.duration {{item.video.duration | secToTime}}
 
 									.addedBy(
-										ng-show='item.addedBy', 
+										ui-if='item.addedBy', 
 										back-img='https://graph.facebook.com/{{item.addedBy.id}}/picture'
 									)
 

@@ -56,7 +56,8 @@ html(lang='en', ng-app='app')
 			input(
 				type='search', 
 				ng-model='searchQuery',
-				ui-keypress='{13: \'search(searchQuery)\'}'
+				ui-keypress='{13: \'search(searchQuery)\'}',
+				ng-disabled='active'
 			)
 
 			ul.vertical-video-list

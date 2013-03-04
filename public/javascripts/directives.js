@@ -9,10 +9,16 @@ app.directive('scrollable', function() {
 			axis: attrs.scrollable
 		});
 
+		if (attrs.scrollTo)
+			scope[attrs.scrollTo] = function(i) {
+				console.log(i);
+				$el.tinyscrollbar_update(i);
+			};
+
 		if (attrs.scrollBind) {
 			scope.$watch(attrs.scrollBind, function() {
 				setTimeout(function() {
-					$el.tinyscrollbar_update('relative');
+					$el.tinyscrollbar_update(attrs.defaultUpdate);
 				}, 50);
 			}, true);
 		}
@@ -83,7 +89,8 @@ app.directive('youtubePlayer', function() {
 			    	}
 			    	else {
 			    		switchPlayerVisibility(false);
-			    		player.pauseVideo();
+			    		player.stopVideo();
+			    		player.clearVideo();
 			    	}
 			    });
 			};

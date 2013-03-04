@@ -1,8 +1,8 @@
 function MainCtrl($scope, socket, videoStore) {
+	$scope.active = false;
 	$scope.user = sessionUser;
 	$scope.startModalVisible = !sessionUser.displayName;
-	$scope.currentVideoId = '';
-	$scope.currentVideo = false;
+	$scope.currentVideo;
 	$scope.searchResults = -1;
 	$scope.roomId = document.location.href.match(/\?k=([\w-]+)(#.*)?$/)[1];
 
@@ -11,8 +11,14 @@ function MainCtrl($scope, socket, videoStore) {
 			key: $scope.roomId,
 			type: 'remote',
 			user: $scope.user
-		}, function(id) {
-			$scope.currentVideoId = id;
+		}, function(response) {
+			console.log(response)
+			if (response.accepted) {
+				$scope.currentVideoId = id;
+				$scope.active = true;
+			}
+			else
+				alert('disconnected')
 		});
 	}
 
@@ -38,16 +44,12 @@ function MainCtrl($scope, socket, videoStore) {
 		}
 	};
 
-	socket.on('currentVideo', function(id) {
-		$scope.currentVideoId = id;
+	socket.on('currentVideo', function(v) {
+		$scope.currentVideo = v;
 	});
 
-	$scope.$watch('currentVideoId', function() {
-		if ($scope.currentVideoId)
-			videoStore.get($scope.currentVideoId, function(v) {
-				$scope.currentVideo = v;
-			});
-		else
-			$scope.currentVideo = false;
+	socket.on('end', function() {
+		$scope.active = false;
+		alert('disconnected')
 	});
 }

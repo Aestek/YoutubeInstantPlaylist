@@ -150,11 +150,22 @@ io.sockets.on('connection', function (socket) {
 		socket.set('user', data.user);
 
 		if (data.type == 'remote') {
-			fn(roomData.currentVideo);
-			socket.get('user', function(err, data) {	
-				roomData.connectedRemotes.push(data);
-				roomData.player.emit('remotes', roomData.connectedRemotes);
-			});
+			if (roomData.player) {
+				fn({
+					accepted: true,
+					currentVideo: roomData.currentVideo
+				});
+				socket.get('user', function(err, data) {	
+					roomData.connectedRemotes.push(data);
+					roomData.player.emit('remotes', roomData.connectedRemotes);
+				});
+			}
+			else {
+				fn({
+					accepted: false
+				});
+				socket.disconnect();
+			}
 		}
 		else
 			roomData.player = socket;
@@ -163,19 +174,30 @@ io.sockets.on('connection', function (socket) {
 
 	socket.on('disconnect', function() {
 		socket.get('clientType', function(err, type) {
-			if (type == 'remote') {
-				socket.get('user', function(err, user) {
-					roomData.connectedRemotes.splice(roomData.connectedRemotes.indexOf(user), 1);
-					roomData.player.emit('remotes', roomData.connectedRemotes);
-				})
+			if (type == 'remote' && type) {
+				if (roomData.player)
+					socket.get('user', function(err, user) {
+						roomData.connectedRemotes.splice(roomData.connectedRemotes.indexOf(user), 1);
+						roomData.player.emit('remotes', roomData.connectedRemotes);
+					});
+			}
+			else {
+				io.sockets.in(roomId).emit('end', 'player disconnected');
+				var clients = io.sockets.clients(roomId);
+				for (var i in clients) {
+					clients[i].get('clientType', function(err, type) {
+						if (type == 'remote')
+							clients[i].disconnect();
+					});
+				}
 			}
 				
 		});
 	});
 
-	socket.on('currentVideo', function(id) {
-		io.sockets.manager.rooms['/' + roomId].currentVideo = id;
-		io.sockets.in(roomId).emit('currentVideo', id);
+	socket.on('currentVideo', function(v) {
+		roomData.currentVideo = v;
+		io.sockets.in(roomId).emit('currentVideo', v);
 	});
 
 	socket.on('addVideo', function(video) {
