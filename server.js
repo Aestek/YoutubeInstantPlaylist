@@ -147,17 +147,10 @@ io.sockets.on('connection', function (socket) {
 
 		socket.set('clientType', data.type);
 
-		socket.set('user', data.user);
-
 		if (data.type == 'remote') {
 			if (roomData.player) {
 				fn({
-					accepted: true,
-					currentVideo: roomData.currentVideo
-				});
-				socket.get('user', function(err, data) {	
-					roomData.connectedRemotes.push(data);
-					roomData.player.emit('remotes', roomData.connectedRemotes);
+					accepted: true
 				});
 			}
 			else {
@@ -169,7 +162,15 @@ io.sockets.on('connection', function (socket) {
 		}
 		else
 			roomData.player = socket;
+	});
 
+	socket.on('loggin', function(user, fn) {
+		socket.set('user', user);
+
+		roomData.connectedRemotes.push(user);
+		roomData.player.emit('remotes', roomData.connectedRemotes);
+
+		fn(roomData.currentVideo);
 	});
 
 	socket.on('disconnect', function() {
@@ -196,8 +197,14 @@ io.sockets.on('connection', function (socket) {
 	});
 
 	socket.on('currentVideo', function(v) {
-		roomData.currentVideo = v;
-		io.sockets.in(roomId).emit('currentVideo', v);
+		if (roomData) {
+			roomData.currentVideo = v;
+			io.sockets.in(roomId).emit('currentVideo', v);
+		}
+	});
+
+	socket.on('changePosition', function(i) {
+		roomData.player.emit('changePosition', i);
 	});
 
 	socket.on('addVideo', function(video) {

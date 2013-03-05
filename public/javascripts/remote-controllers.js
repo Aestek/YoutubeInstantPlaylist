@@ -1,29 +1,20 @@
 function MainCtrl($scope, socket, videoStore) {
-	$scope.active = false;
-	$scope.user = sessionUser;
-	$scope.startModalVisible = !sessionUser.displayName;
+	$scope.status = 'init';
+	$scope.user = sessionUser || {};
 	$scope.currentVideo;
 	$scope.searchResults = -1;
 	$scope.roomId = document.location.href.match(/\?k=([\w-]+)(#.*)?$/)[1];
 
-	function initSocket() {
-		socket.emit('init', {
-			key: $scope.roomId,
-			type: 'remote',
-			user: $scope.user
-		}, function(response) {
-			console.log(response)
-			if (response.accepted) {
-				$scope.currentVideoId = id;
-				$scope.active = true;
-			}
-			else
-				alert('disconnected')
-		});
-	}
-
-	if ($scope.user.displayName)
-		initSocket();
+	
+	socket.emit('init', {
+		key: $scope.roomId,
+		type: 'remote'
+	}, function(response) {
+		if (response.accepted)
+			$scope.status = $scope.user.displayName ? $scope.submitUser() : 'loggin';
+		else
+			$scope.status = 'disconnected';
+	});
 
 	$scope.search = function(s) {
 		videoStore.search(s, function(result) {
@@ -31,17 +22,25 @@ function MainCtrl($scope, socket, videoStore) {
 		});
 	};
 
+	$scope.findAutocomplete = function(q, cb) {
+		videoStore.searchAutocomplete(q, function(result) {
+			cb(result);
+		});
+	};
+
 	$scope.addVideo = function(v) {
-		if (confirm('Do you want to add this video to the playlist ?'))
 		socket.emit('addVideo', v);
 	};
 
+	$scope.changePosition = function(i) {
+		socket.emit('changePosition', i);
+	};
+
 	$scope.submitUser = function() {
-		if ($scope.userName) {
-			$scope.user.displayName = $scope.userName;
-			$scope.startModalVisible = false;
-			initSocket();
-		}
+		socket.emit('loggin', $scope.user, function(video) {
+			$scope.status = 'connected';
+			$scope.currentVideo = video;
+		});
 	};
 
 	socket.on('currentVideo', function(v) {
@@ -49,7 +48,6 @@ function MainCtrl($scope, socket, videoStore) {
 	});
 
 	socket.on('end', function() {
-		$scope.active = false;
-		alert('disconnected')
+		$scope.status = 'disconnected';
 	});
 }

@@ -180,6 +180,10 @@ function RemoteCtrl($scope, socket, guid, videoStore) {
 		$scope.connectedRemotes = remotes;
 	});
 
+	socket.on('changePosition', function(i) {
+		$scope.setIndex($scope.currentPosition + i);
+	});
+
 	// watchers
 
 	$scope.$watch('currentPosition', function() {

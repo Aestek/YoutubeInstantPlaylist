@@ -13,7 +13,7 @@ exports.index = function(req, res){
 
 exports.app = function(req, res){
 	res.cookie('origin', '/app');
-	var user = ((req.session.passport || {}).user || {});
+	var user = (req.session.passport || {}).user || null;
 	res.render('app', {
 		user: JSON.stringify(user)
 	});
@@ -25,7 +25,7 @@ exports.app = function(req, res){
 
 exports.remote = function(req, res) {
 	res.cookie('origin', '/remote?k=' + req.query.k);
-	var user = ((req.session.passport || {}).user || {});
+	var user = (req.session.passport || {}).user || null;
 	res.render('remote', {
 		user: JSON.stringify(user)
 	});
