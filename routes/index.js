@@ -30,3 +30,8 @@ exports.remote = function(req, res) {
 		user: JSON.stringify(user)
 	});
 };
+
+exports.partials = function(req, res) {
+	var id = req.route.params.id;
+	res.render('partials/' + id);
+};

@@ -1,0 +1,194 @@
+// search
+.well.row12.col5(ng-controller='SearchCtrl')
+	input.search-youtube.title(
+		type='text', 
+		placeholder='Search Youtube', 
+		ng-model='searchQuery',
+		ui-keypress='{13: \'search(searchQuery)\'}',
+		bs-typeahead='findAutocomplete',
+		bs-typeahead-updater='search'
+	)
+
+	.block-content
+		.no-content(ng-show='searchResults.length == 0') Your search yieled no result
+		.no-content(ng-show='searchResults == -1') &uarr; 
+			br
+			| Search videos to add in your playlist
+		div(scrollable='y', scroll-bind='searchResults')
+			.scrollbar
+				.track
+					.thumb
+
+			.viewport
+				.overview
+					ul.vertical-video-list
+						li(
+							ng-repeat='result in searchResults',
+							title='{{result.title}}',
+							ng-click='addVideo(result)'
+						)
+		
+							.img(back-img='{{result.thumbnail.hqDefault}}')
+								.length {{result.duration | secToTime}}
+							.title {{result.title}}
+							.infos
+								| Views : {{result.viewCount}}
+
+
+// player
+.well.col7.coloffset5.row9
+	.title(
+		background-progressbar, 
+		fgcolor='rgba(86, 173, 0, 0.8)', 
+		bgcolor='rgba(0,0,0, 0.6)', 
+		progress='currentVideoProgress'
+	) {{currentVideo.title}}
+		
+	.block-content
+		.no-content(ng-show='!currentVideo.id') Select a video to play
+
+		
+// remote
+
+#remote(ng-controller='RemoteCtrl')
+	.well.col4.coloffset12.row2
+		//.title Added by
+
+		#added-by.block-content.block-padding
+			div(ui-if='currentAddedBy')
+				img.added-by-picture(
+					ng-src='https://graph.facebook.com/{{currentAddedBy.id}}/picture',
+					ng-show='currentAddedBy.id'
+				)
+				| This video was added by 
+				a {{currentAddedBy.displayName}}
+				|  to the playlist
+			duv(ui-if='!currentAddedBy')
+				strong Uploaded by : 
+				| {{currentVideo.uploader}}
+				br
+				strong On : 
+				| {{currentVideo.uploaded | date:'medium'}}
+
+.well.col4.coloffset12.row3.rowoffset2
+		div(
+			qr-code='http://{{appDomain}}/remote?k={{roomId}}', 
+			width='1000', 
+			height='1000',
+			fgcolor='#424242', 
+			bgcolor='transparent'
+		) 
+		p.block-padding Scan this qrcode to control the player with your phone !
+
+.well.col4.coloffset12.row4.rowoffset5
+		.title Connected remotes ({{connectedRemotes.length}})
+		.block-content(scrollable='y', scroll-bind='connectedRemotes')
+			.no-content(ng-show='connectedRemotes.length == 0') Nobody's connected
+			.scrollbar
+				.track
+					.thumb
+
+			.viewport
+				.overview
+					ul.remote-list
+						li(
+							ng-repeat='remote in connectedRemotes'
+						)
+							img.pull-right(
+								ng-src='https://graph.facebook.com/{{remote.id}}/picture',
+								ng-show='remote.id'
+							)
+							| {{remote.displayName}}
+
+
+
+
+
+// related 
+.col11.coloffset5.row3.rowoffset9
+	.well(
+		scrollable='x', 
+		scroll-bind='currentVideo.relatedVideos'
+	)
+		.viewport
+			ul.horizontal-video-list.overview
+				li(
+					ng-repeat='video in currentVideo.relatedVideos', 
+					ng-click='addVideo(video)'
+				)
+					.img(back-img='{{video.thumbnail.hqDefault}}')
+						.title-container {{video.title}}
+						.duration {{video.duration | secToTime}}
+
+		.scrollbar
+			.track
+				.thumb
+
+//playlist
+.well.col16.row4.rowoffset12(ng-controller='PlaylistCtrl')
+	.title(
+		background-progressbar, 
+		fgcolor='rgba(86, 173, 0, 0.8)', 
+		bgcolor='rgba(0,0,0, 0.6)', 
+		progress='playlistProgress'
+	)
+		#playlistPosition {{currentPosition + 1}}/{{playlist.length}}
+		#playlistTime {{playedDuration + currentTime | secToTime}} / {{totalDuration | secToTime}}
+
+		button.btn.btn-danger.pull-right(
+			ng-click='removeAll()',
+			ng-disabled='playlist.length == 0'
+		)
+			i.icon-remove-sign.icon-white
+			|  Clear
+
+		#playlist-control.btn-group
+			button.btn.btn-large(
+				ng-click='setIndex(currentPosition - 1)',
+				ng-disabled='currentPosition <= 0'
+			)
+				i.icon-step-backward
+			button.btn.btn-large(
+				ng-click='setIndex(currentPosition + 1)',
+				ng-disabled='currentPosition == playlist.length - 1'
+			)
+				i.icon-step-forward
+
+	.block-content
+		div.no-content(ng-show='playlist.length == 0') Your playlist is empty :(
+		div(
+			scrollable='x', 
+			scroll-bind='playlist',
+			default-update='relative',
+			scroll-to='scrollPlaylistTo'
+		)
+			.viewport
+				ul.horizontal-video-list.overview(
+					ui-sortable,
+					ui-options='{axis: "x", forcePlaceholderSize: true}'
+					ng-model='playlist.items'
+				)
+					li(
+						ng-repeat='item in playlist.items', 
+						ng-click='setIndex($index)',
+						ng-class='(playlist.position == $index) && "playing"'
+					)
+						.img(back-img='{{item.video.thumbnail.hqDefault}}')
+							.title-container {{item.video.title}}
+
+							.buttons
+								button.btn.btn-danger(ng-click='removeAt($index)')
+									i.icon-remove-sign.icon-white
+
+							.duration {{item.video.duration | secToTime}}
+
+							.addedBy(
+								ui-if='item.addedBy', 
+								back-img='https://graph.facebook.com/{{item.addedBy.id}}/picture'
+							)
+
+							.playlist-id {{$index + 1}}
+
+			.scrollbar
+				.track
+					.thumb

@@ -6,7 +6,7 @@
     "start": "node app"
   },
   "engines": {
-  	"node": "0.6.x"
+  	"node": "0.8.x"
   },
   "dependencies": {
     "express": "3.1.0",
@@ -17,7 +17,8 @@
     "socket.io" : "0.9",
     "passport" : "*",
     "passport-facebook": "*",
-    "connect": "1.x",
-    "cookie": "*"
+    "connect": "*",
+    "cookie": "*",
+    "mongoose": "*"
   }
 }

@@ -13,6 +13,7 @@ var express = require('express')
 	, FacebookStrategy = require('passport-facebook').Strategy
 	, connect = require('connect')
 	, cookie = require('cookie')
+	, mongoose = require('mongoose')
 ;
 
 // session setup
@@ -20,15 +21,21 @@ var express = require('express')
 var sessionStore = new connect.session.MemoryStore();
 var sessionSecret = 'c7b86b18-cc90-463d-9e2a-ae7d4cf9b128';
 
+// db setup
+
+mongoose.connect('mongodb://localhost/yip');
+
+var userSchema = new mongoose.Schema({
+	infos: Object,
+	playlists: [{
+		name: String,
+		videos: Array
+	}]
+});
+var dbUser = mongoose.model('User', userSchema);
+
 // passport setup
 
-// Passport session setup.
-//	 To support persistent login sessions, Passport needs to be able to
-//	 serialize users into and deserialize users out of the session.	Typically,
-//	 this will be as simple as storing the user ID when serializing, and finding
-//	 the user by ID when deserializing.	However, since this example does not
-//	 have a database of user records, the complete Facebook profile is serialized
-//	 and deserialized.
 passport.serializeUser(function(user, done) {
 	done(null, user);
 });
@@ -37,11 +44,6 @@ passport.deserializeUser(function(obj, done) {
 	done(null, obj);
 });
 
-
-// Use the FacebookStrategy within Passport.
-//	 Strategies in Passport require a `verify` function, which accept
-//	 credentials (in this case, an accessToken, refreshToken, and Facebook
-//	 profile), and invoke a callback with a user object.
 passport.use(new FacebookStrategy({
 		clientID: '140946366072938',
 		clientSecret: 'e2bb01c1ed27f92268e304fe10019832',
@@ -49,7 +51,19 @@ passport.use(new FacebookStrategy({
 		profileFields: ['cover', 'id', 'displayName', 'profileUrl']
 	},
 	function(accessToken, refreshToken, profile, done) {
-		return done(null, profile);
+		process.nextTick(function () {
+			dbUser.findOne({'infos.id': profile.id, 'infos.provider': 'facebook'}, function(err, user) {
+				if (!user) {
+					user = new dbUser({
+						infos: profile,
+						playlists: []
+					});
+					user.save();
+				}
+				console.log(user);
+				done(null, user);
+			});
+		});
 	}
 ));
 
@@ -86,6 +100,7 @@ app.configure('development', function(){
 app.get('/', routes.index);
 app.get('/app', routes.app);
 app.get('/remote', routes.remote);
+app.get('/partials/:id', routes.partials)
 
 app.get('/api/video/:id', apiRoutes.video);
 app.get('/api/search/', apiRoutes.search);
@@ -99,7 +114,7 @@ app.get('/auth/facebook/callback',
 		res.redirect(req.cookies.origin || '/');
 	});
 
-app.get('/logout', function(req, res){
+app.get('/auth/logout/', function(req, res){
 	req.logout();
 	res.redirect('/');
 });

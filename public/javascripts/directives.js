@@ -9,12 +9,6 @@ app.directive('scrollable', function() {
 			axis: attrs.scrollable
 		});
 
-		if (attrs.scrollTo)
-			scope[attrs.scrollTo] = function(i) {
-				console.log(i);
-				$el.tinyscrollbar_update(i);
-			};
-
 		if (attrs.scrollBind) {
 			scope.$watch(attrs.scrollBind, function() {
 				setTimeout(function() {
@@ -38,7 +32,8 @@ app.directive('youtubePlayer', function() {
     	scope: {
       		video: '=',
      		currentTime: '=',
-     		playerState: '='
+     		playerState: '=',
+     		volume: '='
      	},
      	controller: function($scope, $element, guid) {
      		var $el = $($element);
@@ -49,7 +44,7 @@ app.directive('youtubePlayer', function() {
 
 			// YoutubePlayer requires a video id to load
 		    var att = { 
-		    	data: 'http://www.youtube.com/v/K-aERDSzU10?enablejsapi=1&autohide=1&color=white&controls=2&modestbranding=0&rel=0&playerapiid=' + container,
+		    	data: 'http://www.youtube.com/v/K-aERDSzU10?enablejsapi=1&controls=0&modestbranding=0&rel=0&playerapiid=' + container,
 		    	width: '100%', 
 		    	height: '100%' 
 		    };
@@ -83,6 +78,7 @@ app.directive('youtubePlayer', function() {
 		    	player.addEventListener('onStateChange', 'onYouTubePlayerStateChange');
 
 			    $scope.$watch('video', function() {
+			    	console.log('video', $scope.video)
 			    	if ($scope.video.id) {
 			    		switchPlayerVisibility(true);
 			    		player.loadVideoById($scope.video.id);
@@ -92,6 +88,10 @@ app.directive('youtubePlayer', function() {
 			    		player.stopVideo();
 			    		player.clearVideo();
 			    	}
+			    });
+
+			    $scope.$watch('volume', function(val) {
+			    	player.setVolume(val);
 			    });
 			};
 
@@ -149,103 +149,6 @@ app.directive('qrCode', function() {
 					foreground: attrs.fgcolor
 				});
 		});
-	};
-});
-
-app.directive('particular', function() {
-	return function(scope, element, attrs) {
-		$el = $(element);
-
-		function setSize() {
-			elX = $el.innerWidth();
-			elY = $el.innerHeight();
-
-			$canvas.css({
-				height: elY,
-				width: elX
-			})
-		}
-
-		elX = $el.innerWidth();
-		elY = $el.innerHeight();
-
-		var $canvas = $('<canvas height="' + elY + '" width="' + elX + '" />').prependTo($el);
-		setSize();
-		$(window).resize(function() {
-			setSize();
-		});
-
-		 var defaultsSettings = {
-	        shape: 'square',
-	        velocity: new Vector({y: -3}),
-	        xVariance: elX / 2,
-	        yVariance: 0,
-	        spawnSpeed: 1,
-	        generations: 1,
-	        maxParticles: 200,
-	        size: 30,
-	        sizeVariance: 30,
-	        life: 300,
-	        lifeVariance: 10,    
-	        direction: 0,
-	        directionVariance: 15,
-	        color: '#1B9EE0',
-	        opacity: 0.9,
-	        onDraw: function(p) {
-	          var y = -this.age * 3;
-	          p.size *= 0.999;
-	          p.opacity = 0.6 - (p.age / p.life * 0.5);
-	        },
-            position: new Vector({
-                x: elX / 2,
-                y: elY
-            })
-        };
-
-        var currentSettings = $.extend({}, defaultsSettings);
-
-		var canvas = $canvas.get(0);
-	    particles = new ParticleCanvas(canvas, {
-            x: elX / 2,
-            y: elY / 2
-        });
-	    particles.start();
-	    particles.update(currentSettings);
-
-   		attrs.$observe('particular', function(modifiers) {
-   			modifiers = scope.$eval(modifiers);
-		   
-		   	for (var i in modifiers) {
-		   		(function(exp) {
-		   			var currentValParams;
-		   			var inited = false;
-		   			scope.$watch(exp, function(expValue, oldExpValue) {
-		   				if (inited) {
-			   				if (modifiers[exp].type == 'change') {
-					   			particles.update($.extend(currentSettings, currentSettings, modifiers[exp].vals));
-
-					   			setTimeout(function() {
-					   				particles.update(defaultsSettings);
-					   				currentSettings = $.extend({}, defaultsSettings);
-					   			}, 1000);
-					   		}
-					   		else {
-					   			var val = modifiers[exp].vals[expValue] || modifiers[exp].vals.default;
-					   			if (!angular.equals(val, currentValParams)) {
-						   			$.extend(defaultsSettings, defaultsSettings, val);
-						   			particles.update($.extend(currentSettings, currentSettings, val));
-						   			currentValParams = val;
-						   		}
-					   		}
-					   	}
-					   	else
-					   		inited = true;
-			   		
-		   			}, true);
-		   		})(i);
-		   	}
-		});
-
 	};
 });
 
@@ -371,3 +274,50 @@ app.directive('bsModal', ['$parse', '$compile', '$http', '$timeout', '$q', '$tem
 		}
 	};
 }]);
+
+app.directive('noClick', function() {
+	return function(scope, element, attrs) {
+		$(element).click(function(e) {
+			e.stopPropagation();
+			return false;
+		});
+	};
+});
+
+app.directive('verticalProgressBar', function() {
+	return {
+    	restrict: 'A',
+     	replace: false,
+    	scope: {
+      		value: '=verticalProgressBar'
+     	},
+     	controller: function($scope, $element, guid) {
+     		$el = $($element);
+     		$bar = $el.find('.bar');
+
+     		function setProgress(y) {
+     			$scope.$apply(function() {
+     				$scope.value = 100 - (y - $el.offset().top) / $el.height() * 100;
+     				$bar.css('height', $scope.value + '%');
+     			});
+     			
+     		}
+
+     		$el.mousedown(function(e) {
+     			setProgress(e.pageY);
+
+     			$el.mousemove(function(e) {
+     				setProgress(e.pageY);
+     			});
+
+     			$(window).one('mouseup', function() {
+     				$el.unbind('mousemove');
+     			});
+     		});
+
+     		$scope.$watch('value', function() {
+     			$bar.css('height', $scope.value + '%');
+     		});
+     	}
+    };
+});

@@ -1403,13 +1403,20 @@ body {
 body {
   background: #CCCCCC;
 }
+.main-container {
+  position: absolute;
+  top: 42px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
 .well {
   padding: 0;
   border: 0;
-  -moz-box-shadow: 0px 0px 5px 0px #aaaaaa;
-  -webkit-box-shadow: 0px 0px 5px 0px #aaaaaa;
-  -o-box-shadow: 0px 0px 5px 0px #aaaaaa;
-  box-shadow: 0px 0px 5px 0px #aaaaaa;
+  -moz-box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.5);
+  -o-box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.5);
+  box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.5);
   border-radius: 0;
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
@@ -1472,10 +1479,30 @@ hr {
   box-sizing: border-box;
 }
 .player-container {
+  width: 100%;
+  height: 100%;
   background-color: black;
 }
 .player-container.hidden {
   visibility: hidden;
+}
+.volume-dropdown {
+  width: 20px;
+  min-width: 0;
+  padding: 3px;
+}
+.volume-dropdown .progress {
+  width: 20px;
+  height: 100px;
+  margin: 0;
+  position: relative;
+  cursor: pointer;
+}
+.volume-dropdown .progress .bar {
+  width: 100%;
+  height: auto;
+  position: absolute;
+  bottom: 0;
 }
 .horizontal-video-list {
   list-style-type: none;
