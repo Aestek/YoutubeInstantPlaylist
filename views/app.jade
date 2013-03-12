@@ -11,6 +11,7 @@ html(lang='en', ng-app='app')
 		script(src='lib/jquery/jquery-ui-1.8.21.custom.min.js', type='text/javascript')
 		script(src='lib/jquery/jquery-ui-sortables-custom.js', type='text/javascript')
 		script(src='lib/bootstrap/js/bootstrap.min.js', type='text/javascript')
+		script(src='lib/bootstrap/js/twitter-bootstrap-hover-dropdown.min.js', type='text/javascript')
 		script(src='lib/angular.min.js', type='text/javascript')
 		script(src='lib/angular-ui/angular-ui.js', type='text/javascript')
 		script(src='lib/jquery.tinyscrollbar.min.js', type='text/javascript')
@@ -40,17 +41,25 @@ html(lang='en', ng-app='app')
 				video='playback.currentVideo', 
 				current-time='playback.currentElapsedTime',
 				player-state='playback.playerState',
-				volume='playback.volume'
+				volume='playback.volume',
+				mute='playback.mute'
 			)
+
+		#video-overlay
 
 		.navbar.navbar-inverse
 			.navbar-inner.navbar-fixed-top
 				span.brand YoutubeInstantPlaylist
 
-				ul.nav
+				ul.nav(ng-controller='PlayerControlsCtrl')
 					li
-						a.dropdown-toggle(data-toggle='dropdown')
-							i.icon-volume-up.icon-white
+						a.dropdown-toggle(
+							ng-click='playback.mute = !playback.mute'
+							data-hover='dropdown'
+						)
+							i.icon-white(
+								ng-class='{"icon-volume-up" : playback.volume > 50 && !playback.mute, "icon-volume-down" : playback.volume <= 50  && !playback.mute, "icon-volume-off": playback.mute}'
+							)
 						ul.dropdown-menu.volume-dropdown
 							li 
 								.progress(vertical-progress-bar='playback.volume', no-click)
@@ -59,19 +68,33 @@ html(lang='en', ng-app='app')
 					li.divider-vertical
 
 					li
-						a
+						a.navbar-btn(
+							ng-click='previous()',
+							ng-class='{disabled:playback.position <= 0}'
+						)
 							i.icon-white.icon-step-backward
 					li
-						a
+						a(ng-class='{disabled: playlist.items.length == 0}')
 							i.icon-white(
-								ng-class='{"icon-pause": playback.playerState == 1, "icon-play": playback.playerState != 1}',
-								ng-click='playback.playing = !playback.playing'
+								ng-class='{"icon-pause": playback.playerState == 1, "icon-video-loader": playback.playerState == 3, "icon-play": playback.playerState == 2 || playback.playerState == 5}',
+								ng-click='togglePlay()'
 							)
 					li
-						a
+						a(
+							ng-click='next()',
+							ng-class='{disabled: playlist.items.length - 1 <= playback.position || playlist.items.length == 0}'
+						)
 							i.icon-white.icon-step-forward
+
+					li.divider-vertical
+
 					li
-						.current-title {{playback.currentVideo.title}}
+						p.navbar-text.current-title(
+							background-progressbar, 
+							fgcolor='rgba(255, 255, 255, 0.4)', 
+							bgcolor='transparent', 
+							progress='playback.currentElapsedTime / playback.currentVideo.duration * 100'
+						) {{playback.currentVideo.title}}
 
 				div(ng-controller='UserCtrl')
 					ul.nav.pull-right(ng-show='!user.infos')

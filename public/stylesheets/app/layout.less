@@ -11,7 +11,7 @@ html, body {
 }
 
 body {
-	background: #CCCCCC;
+	//background: #CCCCCC;
 }
 
 .main-container {
@@ -37,6 +37,7 @@ body {
 		height: @titleHeight;
 		.box-sizing();
 		width: 100%;
+		text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
 
 		line-height: @titleHeight - 10px;
 		text-shadow: 0px 0px 3px black;
@@ -96,10 +97,24 @@ hr {
 	}
 }
 
+#video-overlay {
+	background: rgba(0,0,0,0.2);
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
 .volume-dropdown {
 	width: 20px;
 	min-width: 0;
 	padding: 3px;
+	left: 5px;
+
+	&:after {
+		left: 8px !important;
+	}
 
 	.progress {
 		width: 20px;
@@ -115,4 +130,26 @@ hr {
 			bottom: 0;
 		}
 	}
+}
+
+.icon-video-loader {
+	background-image: url('/images/video-loader.gif');
+	background-position: 0 0;
+}
+
+.current-title {
+	color: white !important;
+	font-weight: bold;
+	max-width: 250px;
+	padding: 0 5px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
+a.disabled {
+	opacity: 0.5;
+	cursor: default;
+	pointer-events: none;
 }

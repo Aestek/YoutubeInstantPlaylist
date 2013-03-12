@@ -35,18 +35,6 @@
 								| Views : {{result.viewCount}}
 
 
-// player
-.well.col7.coloffset5.row9
-	.title(
-		background-progressbar, 
-		fgcolor='rgba(86, 173, 0, 0.8)', 
-		bgcolor='rgba(0,0,0, 0.6)', 
-		progress='currentVideoProgress'
-	) {{currentVideo.title}}
-		
-	.block-content
-		.no-content(ng-show='!currentVideo.id') Select a video to play
-
 		
 // remote
 
@@ -71,49 +59,46 @@
 				| {{currentVideo.uploaded | date:'medium'}}
 
 .well.col4.coloffset12.row3.rowoffset2
-		div(
-			qr-code='http://{{appDomain}}/remote?k={{roomId}}', 
-			width='1000', 
-			height='1000',
-			fgcolor='#424242', 
-			bgcolor='transparent'
-		) 
-		p.block-padding Scan this qrcode to control the player with your phone !
+	div(
+		qr-code='http://{{appDomain}}/remote?k={{roomId}}', 
+		width='1000', 
+		height='1000',
+		fgcolor='#424242', 
+		bgcolor='transparent'
+	) 
+	p.block-padding Scan this qrcode to control the player with your phone !
 
 .well.col4.coloffset12.row4.rowoffset5
-		.title Connected remotes ({{connectedRemotes.length}})
-		.block-content(scrollable='y', scroll-bind='connectedRemotes')
-			.no-content(ng-show='connectedRemotes.length == 0') Nobody's connected
-			.scrollbar
-				.track
-					.thumb
+	.title Connected remotes ({{connectedRemotes.length}})
+	.block-content(scrollable='y', scroll-bind='connectedRemotes')
+		.no-content(ng-show='connectedRemotes.length == 0') Nobody's connected
+		.scrollbar
+			.track
+				.thumb
 
-			.viewport
-				.overview
-					ul.remote-list
-						li(
-							ng-repeat='remote in connectedRemotes'
+		.viewport
+			.overview
+				ul.remote-list
+					li(
+						ng-repeat='remote in connectedRemotes'
+					)
+						img.pull-right(
+							ng-src='https://graph.facebook.com/{{remote.id}}/picture',
+							ng-show='remote.id'
 						)
-							img.pull-right(
-								ng-src='https://graph.facebook.com/{{remote.id}}/picture',
-								ng-show='remote.id'
-							)
-							| {{remote.displayName}}
-
-
-
+						| {{remote.displayName}}
 
 
 // related 
-.col11.coloffset5.row3.rowoffset9
-	.well(
+.col11.coloffset5.row3.rowoffset9.well
+	div(
 		scrollable='x', 
-		scroll-bind='currentVideo.relatedVideos'
+		scroll-bind='playback.currentVideo.relatedVideos'
 	)
 		.viewport
 			ul.horizontal-video-list.overview
 				li(
-					ng-repeat='video in currentVideo.relatedVideos', 
+					ng-repeat='video in playback.currentVideo.relatedVideos', 
 					ng-click='addVideo(video)'
 				)
 					.img(back-img='{{video.thumbnail.hqDefault}}')
@@ -130,10 +115,10 @@
 		background-progressbar, 
 		fgcolor='rgba(86, 173, 0, 0.8)', 
 		bgcolor='rgba(0,0,0, 0.6)', 
-		progress='playlistProgress'
+		progress='(playback.elapsedTime + playback.currentElapsedTime) / playlist.totalTime * 100'
 	)
-		#playlistPosition {{currentPosition + 1}}/{{playlist.length}}
-		#playlistTime {{playedDuration + currentTime | secToTime}} / {{totalDuration | secToTime}}
+		#playlistPosition {{playback.position + 1}}/{{playlist.items.length}}
+		#playlistTime {{playback.elapsedTime + playback.currentElapsedTime | secToTime}} / {{playlist.totalTime | secToTime}}
 
 		button.btn.btn-danger.pull-right(
 			ng-click='removeAll()',
@@ -142,25 +127,12 @@
 			i.icon-remove-sign.icon-white
 			|  Clear
 
-		#playlist-control.btn-group
-			button.btn.btn-large(
-				ng-click='setIndex(currentPosition - 1)',
-				ng-disabled='currentPosition <= 0'
-			)
-				i.icon-step-backward
-			button.btn.btn-large(
-				ng-click='setIndex(currentPosition + 1)',
-				ng-disabled='currentPosition == playlist.length - 1'
-			)
-				i.icon-step-forward
-
 	.block-content
-		div.no-content(ng-show='playlist.length == 0') Your playlist is empty :(
+		div.no-content(ng-show='playlist.items.length == 0') Your playlist is empty :(
 		div(
 			scrollable='x', 
 			scroll-bind='playlist',
-			default-update='relative',
-			scroll-to='scrollPlaylistTo'
+			default-update='relative'
 		)
 			.viewport
 				ul.horizontal-video-list.overview(
@@ -171,7 +143,7 @@
 					li(
 						ng-repeat='item in playlist.items', 
 						ng-click='setIndex($index)',
-						ng-class='(playlist.position == $index) && "playing"'
+						ng-class='(playback.position == $index) && "playing"'
 					)
 						.img(back-img='{{item.video.thumbnail.hqDefault}}')
 							.title-container {{item.video.title}}
