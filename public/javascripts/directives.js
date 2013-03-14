@@ -4,7 +4,6 @@
 app.directive('scrollable', function() {
 	return function(scope, element, attrs) {
 		var $el = $(element);
-
 		$el.tinyscrollbar({
 			axis: attrs.scrollable
 		});

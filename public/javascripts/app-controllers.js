@@ -123,3 +123,7 @@ function PlayerControlsCtrl($scope) {
 		$scope.playback.mute = false;
 	});
 }
+
+function UserCtrl($scope) {
+	$scope.user = sessionUser;
+}

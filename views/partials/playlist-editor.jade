@@ -34,41 +34,47 @@
 							.infos
 								| Views : {{result.viewCount}}
 
+// infos
 
-		
-// remote
+.well.col5.coloffset5.row9(ng-controller='VideoInfosCtrl')
+	.title {{playback.currentVideo.title}}
+	.block-content.block-padding
+		p
+			strong Uploaded on : 
+			| {{playback.currentVideo.uploaded | date:'medium'}}
+		p
+			strong By : 
+			| {{playback.currentVideo.uploader}}
 
-#remote(ng-controller='RemoteCtrl')
-	.well.col4.coloffset12.row2
-		//.title Added by
+		hr
 
-		#added-by.block-content.block-padding
-			div(ui-if='currentAddedBy')
-				img.added-by-picture(
-					ng-src='https://graph.facebook.com/{{currentAddedBy.id}}/picture',
-					ng-show='currentAddedBy.id'
-				)
-				| This video was added by 
-				a {{currentAddedBy.displayName}}
-				|  to the playlist
-			duv(ui-if='!currentAddedBy')
-				strong Uploaded by : 
-				| {{currentVideo.uploader}}
-				br
-				strong On : 
-				| {{currentVideo.uploaded | date:'medium'}}
+		#video-description
+			div(scrollable='y', scroll-bind='playback.currentVideo.description')
+				.scrollbar
+					.track
+						.thumb
 
-.well.col4.coloffset12.row3.rowoffset2
-	div(
-		qr-code='http://{{appDomain}}/remote?k={{roomId}}', 
-		width='1000', 
-		height='1000',
-		fgcolor='#424242', 
-		bgcolor='transparent'
-	) 
-	p.block-padding Scan this qrcode to control the player with your phone !
+				.viewport
+					.overview(ng-bind-html-unsafe='playback.currentVideo.description | formatText')
 
-.well.col4.coloffset12.row4.rowoffset5
+		#uploader-videos
+			div(scrollable='x', scroll-bind='uploaderVideos')
+				.viewport
+					ul.horizontal-video-list.overview
+						li(
+							ng-repeat='video in uploaderVideos', 
+							ng-click='addVideo(video)'
+						)
+							.img(back-img='{{video.thumbnail.hqDefault}}')
+								.title-container {{video.title}}
+								.duration {{video.duration | secToTime}}
+				.scrollbar
+					.track
+						.thumb
+
+// remotes
+
+.well.col3.coloffset10.row6
 	.title Connected remotes ({{connectedRemotes.length}})
 	.block-content(scrollable='y', scroll-bind='connectedRemotes')
 		.no-content(ng-show='connectedRemotes.length == 0') Nobody's connected
@@ -87,6 +93,21 @@
 							ng-show='remote.id'
 						)
 						| {{remote.displayName}}
+
+.well.col3.coloffset10.row3.rowoffset6
+	div(
+		qr-code='http://{{appDomain}}/remote?k={{roomId}}', 
+		width='1000', 
+		height='1000',
+		fgcolor='#424242', 
+		bgcolor='transparent'
+	) 
+
+// quick playlist
+
+.well.col3.coloffset13.row9
+	.title Quick playlists
+	.block-content(scrollable='y', scroll-bind='connectedRemotes')
 
 
 // related 

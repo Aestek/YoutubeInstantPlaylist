@@ -92,6 +92,13 @@ function PlaylistCtrl($scope) {
 	});*/
 }
 
-function UserCtrl($scope) {
-	$scope.user = sessionUser;
+function VideoInfosCtrl($scope, videoStore) {
+	$scope.uploaderVideos = [];
+	$scope.$watch('playback.currentVideo', function(val) {
+		if (val.id) 
+			videoStore.uploaderVideos(val.uploader, function(data) {
+				console.log(data)
+				$scope.uploaderVideos = data;
+			});
+	});
 }

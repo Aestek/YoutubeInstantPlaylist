@@ -3,6 +3,7 @@
 app.factory('videoStore', function($http, $cacheFactory) {
 	var caches = {
 		video : $cacheFactory('video'),
+		uploaderVideo: $cacheFactory('uploaderVideo'),
 		search : $cacheFactory('search'),
 		searchAutocomplete: $cacheFactory('searchAutocomplete')
 	};
@@ -50,6 +51,15 @@ app.factory('videoStore', function($http, $cacheFactory) {
 		get: function(id, callback) {
 			getCacheGeneric('video', id, function(fn) {
 				$http.get('/api/video/' + id).success(function(data) {
+					fn(data);
+				});
+			}, function(e) {
+				callback(e);
+			});
+		},
+		uploaderVideos: function(id, callback) {
+			getCacheGeneric('uploaderVideo', id, function(fn) {
+				$http.get('/api/uploader-videos/' + id).success(function(data) {
 					fn(data);
 				});
 			}, function(e) {

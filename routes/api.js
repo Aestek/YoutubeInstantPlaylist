@@ -46,6 +46,23 @@ exports.video = function(req, res) {
 	});
 };
 
+exports.uploaderVideo = function(req, res) {
+	var id = req.route.params.id;
+	request(
+		{uri: 'http://gdata.youtube.com/feeds/api/users/' + id + '/uploads?v=2&alt=jsonc'},
+		function (error, response, body) {
+			try {
+				var o = JSON.parse(body);
+				res.send(200, o.data.items);
+			}
+			catch (ex) {
+				res.send(500)
+			}
+		}
+	);
+};
+
+
 exports.search = function(req, res) {
 	var q = req.query.q;
 	request(

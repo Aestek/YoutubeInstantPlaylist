@@ -103,6 +103,7 @@ app.get('/remote', routes.remote);
 app.get('/partials/:id', routes.partials)
 
 app.get('/api/video/:id', apiRoutes.video);
+app.get('/api/uploader-videos/:id', apiRoutes.uploaderVideo);
 app.get('/api/search/', apiRoutes.search);
 app.get('/api/search-autocomplete/', apiRoutes.searchAutocomplete);
 

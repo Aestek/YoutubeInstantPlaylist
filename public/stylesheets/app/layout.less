@@ -28,7 +28,7 @@ body {
 	.shadow(rgba(0,0,0,0.3), 5px);
 	.rounded-corners(0);
 	margin: 0;
-	background-color: rgba(255,255,255, 0.5);
+	background-color: rgba(255,255,255, 0.7);
 
 	& > .title {
 		background-color: rgba(0,0,0, 0.6);
@@ -38,6 +38,9 @@ body {
 		.box-sizing();
 		width: 100%;
 		text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
 
 		line-height: @titleHeight - 10px;
 		text-shadow: 0px 0px 3px black;
@@ -62,12 +65,14 @@ body {
 hr {
 	border-top-color: rgba(0,0,0,0.1);
 	border-bottom-color: rgba(255,255,255,0.2);
+	margin: 10px 0;
 }
 
 .block-content {
 	position: relative;
 	.box-sizing();
 	.height-minus100(@titleHeight);
+	overflow: hidden;
 
 	.no-content {
 		width: 100%;
@@ -82,7 +87,7 @@ hr {
 }
 
 .block-padding {
-	padding: 7px;
+	padding: 5px;
 	.box-sizing();
 }
 
