@@ -1812,14 +1812,26 @@ a.disabled {
 [scrollable='x'] .viewport ul.overview {
   padding-right: 30px;
 }
-[qr-code] {
-  font-weight: bold;
+#remote {
   text-align: center;
 }
-[qr-code] canvas {
+#remote .qr-container {
+  max-width: 50%;
   height: 100%;
+  display: block;
   float: left;
-  margin-right: 10px;
+}
+#remote .qr-container qr-code:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+}
+#remote .qr-container qr-code * {
+  display: inline-block;
+  max-height: 100%;
+  max-width: 100%;
+  vertical-align: middle;
 }
 .remote-list {
   list-style-type: none;
@@ -1830,12 +1842,4 @@ a.disabled {
   height: 50px;
   line-height: 50px;
   padding-left: 10px;
-}
-#added-by {
-  bakground-size: cover;
-  background-position: 50% 50%;
-}
-.added-by-picture {
-  float: right;
-  margin: 0 0 10px 10px;
 }

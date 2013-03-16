@@ -1,12 +1,10 @@
 function SearchCtrl($scope, videoStore) {
 
 	// properties
-
 	$scope.searchResults = -1;
 
 
 	// methods
-
 	$scope.search = function(q) {
 		videoStore.search(q, function(result) {
 			$scope.searchResults = result.items || [];
@@ -23,14 +21,13 @@ function SearchCtrl($scope, videoStore) {
 function RemoteCtrl($scope, socket, guid, videoStore) {
 
 	// properties
-
-	$scope.roomId = 'aaa' //guid.get();
+	$scope.roomId = guid.get();
 	$scope.socketConnected = false;
 	$scope.appDomain = window.location.host;
 	$scope.connectedRemotes = [];
+	$scope.active = true;
 
 	// socket
-
 	socket.emit('init', {
 		key: $scope.roomId, 
 		type: 'player'
@@ -51,7 +48,6 @@ function RemoteCtrl($scope, socket, guid, videoStore) {
 	});
 
 	// watchers
-
 	$scope.$watch('currentPosition', function() {
 		socket.emit('currentVideo', $scope.playlist.currentVideo);
 	});
@@ -97,7 +93,6 @@ function VideoInfosCtrl($scope, videoStore) {
 	$scope.$watch('playback.currentVideo', function(val) {
 		if (val.id) 
 			videoStore.uploaderVideos(val.uploader, function(data) {
-				console.log(data)
 				$scope.uploaderVideos = data;
 			});
 	});

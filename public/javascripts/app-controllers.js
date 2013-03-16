@@ -23,11 +23,12 @@ function MainCtrl($scope, videoStore) {
 	$scope.addVideo = function(v, user) {
 		var i = $scope.playlist.items.push({
 			video: v,
-			addedBy: user
+			addedBy: user,
+			date: new Date().toString()
 		}) - 1;
 		if (i == 0)
 			$scope.setIndex(0);
-
+		console.log(new Date().getTime());
 		return i;
 	};
 
@@ -63,7 +64,6 @@ function MainCtrl($scope, videoStore) {
 	// watcher
 
 	$scope.$watch('playback.position', function(val) {
-		console.log(val)
 		$scope.playback.currentVideo = ($scope.playlist.items[$scope.playback.position] || {}).video || {};
 
 		if (!$scope.playback.currentVideo.relatedVideos && $scope.playback.currentVideo.id)

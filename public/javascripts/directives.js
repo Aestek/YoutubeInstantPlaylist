@@ -150,143 +150,32 @@ app.directive('backImg', function() {
 // directive wrapper for the qrCode jQuery plugin
 
 app.directive('qrCode', function() {
-	return function(scope, element, attrs) {
-		var $el = $(element);
-		attrs.$observe('qrCode', function(val) {
-			if (val)
-				$el.qrcode({
-					text: val,
-					width: attrs.width,
-					height: attrs.height,
-					background: attrs.bgcolor,
-					foreground: attrs.fgcolor
-				});
-		});
-	};
+	return {
+    	restrict: 'E',
+     	replace: false,
+    	scope: {
+      		text: '@',
+      		width: '@',
+      		height: '@',
+      		bgColor: '@',
+      		fgColor: '@'
+      	},
+      	link: function(scope, element, attrs) {
+      		var $el = $(element);
+			scope.$watch('text', function(val) {
+				if (val)
+					$el.qrcode({
+						text: val,
+						width: scope.width,
+						height: scope.height,
+						background: scope.bgColor,
+						foreground: scope.fgColor
+					});
+			});
+      	}
+    };
 });
 
-
-app.directive('bsTypeahead', ['$parse', function($parse) {
-	'use strict';
-
-	return {
-		restrict: 'A',
-		require: '?ngModel',
-		link: function postLink(scope, element, attrs, controller) {
-
-			var getter = $parse(attrs.bsTypeahead),
-					setter = getter.assign,
-					value = getter(scope),
-					updater = $parse(attrs.bsTypeaheadUpdater)(scope);
-
-			// Watch bsTypeahead for changes
-			scope.$watch(attrs.bsTypeahead, function(newValue, oldValue) {
-				if(newValue !== oldValue) {
-					value = newValue;
-				}
-			});
-
-			element.attr('data-provide', 'typeahead');
-			element.typeahead({
-				source: function(query) { return angular.isFunction(value) ? value.apply(null, arguments) : value; },
-				minLength: attrs.minLength || 1,
-				items: attrs.items,
-				updater: function(value) {
-					// If we have a controller (i.e. ngModelController) then wire it up
-					if(controller) {
-						scope.$apply(function () {
-							controller.$setViewValue(value);
-							updater.apply(null, [value]);
-						});
-					}
-					if (updater)
-						
-					return value;
-				}
-			});
-
-			// Bootstrap override
-			var typeahead = element.data('typeahead');
-			// Fixes #2043: allows minLength of zero to enable show all for typeahead
-			typeahead.lookup = function (ev) {
-				var items;
-				this.query = this.$element.val() || '';
-				if (this.query.length < this.options.minLength) {
-					return this.shown ? this.hide() : this;
-				}
-				items = $.isFunction(this.source) ? this.source(this.query, $.proxy(this.process, this)) : this.source;
-				return items ? this.process(items) : this;
-			};
-
-			// Support 0-minLength
-			if(attrs.minLength === "0") {
-				setTimeout(function() { // Push to the event loop to make sure element.typeahead is defined (breaks tests otherwise)
-					element.on('focus', function() {
-						setTimeout(element.typeahead.bind(element, 'lookup'), 200);
-					});
-				});
-			}
-
-		}
-	};
-
-}]);
-
-
-app.directive('bsModal', ['$parse', '$compile', '$http', '$timeout', '$q', '$templateCache', function($parse, $compile, $http, $timeout, $q, $templateCache) {
-	'use strict';
-
-	return {
-		restrict: 'A',
-		scope: true,
-		link: function postLink(scope, element, attr, ctrl) {
-
-			var getter = $parse(attr.bsModal),
-				setter = getter.assign,
-				value = getter(scope);
-
-			$q.when($templateCache.get(value) || $http.get(value, {cache: true})).then(function onSuccess(template) {
-
-				// Handle response from $http promise
-				if(angular.isObject(template)) {
-					template = template.data;
-				}
-
-				// Build modal object
-				var id = getter(scope).replace('.html', '').replace(/\//g, '-').replace(/\./g, '-') + '-' + scope.$id;
-				var $modal = $('<div class="modal hide" tabindex="-1"></div>')
-					.attr('id', id)
-					.attr('data-backdrop', attr.backdrop || true)
-					.attr('data-keyboard', attr.keyboard || true)
-					.addClass(attr.modalClass ? 'fade ' + attr.modalClass : 'fade')
-					.html(template);
-
-				$('body').append($modal);
-
-				// Configure element
-				element.attr('href', '#' + id).attr('data-toggle', 'modal');
-
-				// Compile modal content
-				$timeout(function(){
-					$compile($modal)(scope);
-				});
-
-				// Provide scope display functions
-				scope._modal = function(name) {
-					$modal.modal(name);
-				};
-				scope.hide = function() {
-					$modal.modal('hide');
-				};
-				scope.show = function() {
-					$modal.modal('show');
-				};
-				scope.dismiss = scope.hide;
-
-			});
-		}
-	};
-}]);
 
 app.directive('noClick', function() {
 	return function(scope, element, attrs) {
@@ -334,105 +223,3 @@ app.directive('verticalProgressBar', function() {
      	}
     };
 });
-
-app.directive('bsPopover', ['$parse', '$compile', '$http', '$timeout', '$q', '$templateCache', function($parse, $compile, $http, $timeout, $q, $templateCache) {
-  'use strict';
-
-  // Hide popovers when pressing esc
-  $("body").on("keyup", function(ev) {
-    if(ev.keyCode === 27) {
-      $(".popover.in").each(function() {
-        $(this).popover('hide');
-      });
-    }
-  });
-
-  return {
-    restrict: 'A',
-    scope: true,
-    link: function postLink(scope, element, attr, ctrl) {
-
-      var getter = $parse(attr.bsPopover),
-        setter = getter.assign,
-        value = getter(scope),
-        options = {};
-
-      if(angular.isObject(value)) {
-        options = value;
-        options.content = '<div back-img="{{playlist.items[playback.position - 1].thumbnail.hqDefault}}" />'
-      }
-
-      $q.when(options.content || $templateCache.get(value) || $http.get(value, {cache: true})).then(function onSuccess(template) {
-
-        // Handle response from $http promise
-        if(angular.isObject(template)) {
-          template = template.data;
-        }
-
-        // Handle data-unique attribute
-       // if(!!attr.unique) {
-          element.on('show', function(ev) { // requires bootstrap 2.3.0+
-            // Hide any active popover except self
-            $(".popover.in").each(function() {
-              var $this = $(this),
-                popover = $this.data('popover');
-              if(popover && !popover.$element.is(element)) {
-                $this.popover('hide');
-              }
-            });
-          });
-        //}
-
-        // Handle data-hide attribute to toggle visibility
-        if(!!attr.hide) {
-          scope.$watch(attr.hide, function(newValue, oldValue) {
-            if(!!newValue) {
-              popover.hide();
-            } else if(newValue !== oldValue) {
-              popover.show();
-            }
-          });
-        }
-
-        // Initialize popover
-        element.popover(angular.extend({}, options, {
-          content: template,
-          html: true
-        }));
-
-        // Bootstrap override to provide tip() reference & compilation
-        var popover = element.data('popover');
-        popover.hasContent = function() {
-          return this.getTitle() || template; // fix multiple $compile()
-        };
-        popover.getPosition = function() {
-          var r = $.fn.popover.Constructor.prototype.getPosition.apply(this, arguments);
-
-          // Compile content
-          $compile(this.$tip)(scope);
-          scope.$digest();
-
-          // Bind popover to the tip()
-          this.$tip.data('popover', this);
-
-          return r;
-        };
-
-        // Provide scope display functions
-        scope._popover = function(name) {
-          element.popover(name);
-        };
-        scope.hide = function() {
-          element.popover('hide');
-        };
-        scope.show = function() {
-          element.popover('show');
-        };
-        scope.dismiss = scope.hide;
-
-      });
-
-    }
-  };
-
-}]);

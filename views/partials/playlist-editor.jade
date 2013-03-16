@@ -36,15 +36,21 @@
 
 // infos
 
-.well.col5.coloffset5.row9(ng-controller='VideoInfosCtrl')
-	.title {{playback.currentVideo.title}}
-	.block-content.block-padding
+.well.col7.coloffset5.row9(ng-controller='VideoInfosCtrl')
+	.title {{playback.currentVideo.title || 'No video selected'}}
+	.block-content.block-padding(ng-show='playback.currentVideo.id')
 		p
-			strong Uploaded on : 
-			| {{playback.currentVideo.uploaded | date:'medium'}}
-		p
-			strong By : 
+			strong Uploaded 
+			| {{playback.currentVideo.uploaded | timeAgo}} 
+			strong by 
 			| {{playback.currentVideo.uploader}}
+
+		p
+			strong Added to the playlist 
+			| {{playlist.items[playback.position].date | timeAgo}} 
+			strong by 
+			| {{playlist.items[playback.position].user.displayName || 'you'}} 
+			
 
 		hr
 
@@ -74,40 +80,45 @@
 
 // remotes
 
-.well.col3.coloffset10.row6
-	.title Connected remotes ({{connectedRemotes.length}})
-	.block-content(scrollable='y', scroll-bind='connectedRemotes')
-		.no-content(ng-show='connectedRemotes.length == 0') Nobody's connected
-		.scrollbar
-			.track
-				.thumb
+div(ng-controller='RemoteCtrl')
+	.well.col4.coloffset12.row6
+		.title Connected remotes ({{connectedRemotes.length}})
+		.block-content(scrollable='y', scroll-bind='connectedRemotes')
+			.no-content(ng-show='connectedRemotes.length == 0') Nobody's connected
+			.scrollbar
+				.track
+					.thumb
 
-		.viewport
-			.overview
-				ul.remote-list
-					li(
-						ng-repeat='remote in connectedRemotes'
-					)
-						img.pull-right(
-							ng-src='https://graph.facebook.com/{{remote.id}}/picture',
-							ng-show='remote.id'
+			.viewport
+				.overview
+					ul.remote-list
+						li(
+							ng-repeat='remote in connectedRemotes'
 						)
-						| {{remote.displayName}}
+							img.pull-right(
+								ng-src='https://graph.facebook.com/{{remote.id}}/picture',
+								ng-show='remote.id'
+							)
+							| {{remote.displayName}}
 
-.well.col3.coloffset10.row3.rowoffset6
-	div(
-		qr-code='http://{{appDomain}}/remote?k={{roomId}}', 
-		width='1000', 
-		height='1000',
-		fgcolor='#424242', 
-		bgcolor='transparent'
-	) 
+	#remote.well.col4.coloffset12.row3.rowoffset6
+		.qr-container(ng-show='active')
+			qr-code(
+				text='http://{{appDomain}}/remote?k={{roomId}}', 
+				width='1000', 
+				height='1000',
+				fg-color='#424242', 
+				bg-color='transparent'
+			)
 
-// quick playlist
+		p Remote is : 
+		p 
+			button.btn(
+				bs-button, 
+				ng-model='active',
+				ng-class='{"btn-success": active, "btn-danger": !active}'
+			) {{active && 'On' || 'Off'}}
 
-.well.col3.coloffset13.row9
-	.title Quick playlists
-	.block-content(scrollable='y', scroll-bind='connectedRemotes')
 
 
 // related 

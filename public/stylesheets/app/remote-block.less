@@ -1,12 +1,30 @@
-[qr-code] {
-	font-weight: bold;
+#remote {
 	text-align: center;
 
-	canvas {
+	.qr-container {
 		height: 100%;
+		max-width: 50%;
+		height: 100%;
+		display: block;
 		float: left;
-		margin-right: 10px;
-		//margin: 0 auto;
+
+		qr-code {
+			
+
+			&:before {
+		  		content: '';
+			  display: inline-block;
+			  height: 100%;
+			  vertical-align: middle;
+			}
+
+			* {
+				display: inline-block;
+				max-height: 100%;
+				max-width: 100%;
+				vertical-align: middle;
+			}
+		}
 	}
 }
 
@@ -20,14 +38,4 @@
 		line-height: 50px;
 		padding-left: 10px;
 	}
-}
-
-#added-by {
-	bakground-size: cover;
-	background-position: 50% 50%;
-}
-
-.added-by-picture {
-	float: right;
-	margin: 0 0 10px 10px;
 }
