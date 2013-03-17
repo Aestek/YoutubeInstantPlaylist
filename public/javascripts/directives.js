@@ -36,6 +36,7 @@ app.directive('scrollable', function() {
 // player event callback must be accessible from the global scope
 var onYouTubePlayerReady;
 var onYouTubePlayerStateChange;
+var onYouTubePlayerQualityChange;
 app.directive('youtubePlayer', function() {
 	return {
     	restrict: 'A',
@@ -46,7 +47,9 @@ app.directive('youtubePlayer', function() {
      		playerState: '=',
      		volume: '=',
      		mute: '=',
-     		seekTo: '='
+     		seekTo: '=',
+     		qualityLevels: '=',
+     		currentQuality: '='
      	},
      	controller: function($scope, $element, guid) {
      		var $el = $($element);
@@ -57,7 +60,7 @@ app.directive('youtubePlayer', function() {
 
 			// YoutubePlayer requires a video id to load
 		    var att = { 
-		    	data: 'http://www.youtube.com/v/K-aERDSzU10?enablejsapi=1&autoplay=0&controls=0&modestbranding=0&rel=0&playerapiid=' + container,
+		    	data: 'http://www.youtube.com/v/K-aERDSzU10?enablejsapi=1&autoplay=0&controls=0&modestbranding=1&iv_load_policy=3&rel=0&playerapiid=' + container,
 		    	width: '100%', 
 		    	height: '100%' 
 		    };
@@ -88,7 +91,12 @@ app.directive('youtubePlayer', function() {
 		    		$scope.playerState = state;
 		    	};
 
+		    	onYouTubePlayerQualityChange = function(quality) {
+		    		$scope.currentQuality = quality;
+		    	};
+
 		    	player.addEventListener('onStateChange', 'onYouTubePlayerStateChange');
+		    	player.addEventListener('onPlaybackQualityChange', 'onYouTubePlayerQualityChange');
 
 			    $scope.$watch('video', function() {
 			    	if ($scope.video.id) {
@@ -108,11 +116,17 @@ app.directive('youtubePlayer', function() {
 			    });
 
 			    $scope.$watch('playerState', function(val) {
-			    	console.log(val)
-			    	if (val == 1)
+			    	if (val == 1) {
 			    		player.playVideo();
+			    		$scope.qualityLevels = player.getAvailableQualityLevels();
+			    		console.log($scope.qualityLevels);
+			    	}
 			    	else if (val == 2)
 			    		player.pauseVideo();
+			    });
+
+			    $scope.$watch('currentQuality', function(val) {
+			    	player.setPlaybackQuality(val);
 			    });
 
 			    $scope.$watch('mute', function(val) {

@@ -10,8 +10,93 @@ html, body {
 	-ms-user-select: none;
 }
 
-body {
-	//background: #CCCCCC;
+#main-navbar {
+	.dropdown-menu {
+		left: auto;
+	}
+
+	.quality-dropdown {
+		min-width: 0;
+	}
+
+	.video-dropdown {
+		left: auto;
+		margin-left: -60px;
+		margin-top: 10px;
+		padding: 0;
+
+		&:after {
+			left: 75px !important;
+			top: -5px !important;
+			border-bottom-color: black !important;
+		}
+
+		&:before {
+			left: 75px !important;
+			top: -5px !important;
+			border-bottom-color: black !important;
+		}
+
+
+		li {
+			height: 100px;
+			padding: 0;
+
+			.img {
+				width: 160px;
+			}
+		}
+	}
+
+	.volume-dropdown {
+		width: 20px;
+		min-width: 0;
+		padding: 3px;
+		left: 5px;
+
+		&:after {
+			left: 8px !important;
+		}
+
+		.progress {
+			width: 20px;
+			height: 100px;
+			margin: 0;
+			position: relative;
+			cursor: pointer;
+
+			.bar {
+				width: 100%;
+				height: auto;
+				position: absolute;
+				bottom: 0;
+			}
+		}
+	}
+
+	.current-title {
+		color: white;
+		font-weight: bold;
+		width: 250px;
+		height: 15px;
+		margin: 5px 0 5px;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	.current-progress {
+		width: 250px;
+		height: 7px;
+		margin: 0;
+	}
+
+	.video-time {
+		margin: 22px 5px 0;
+		line-height: 15px;
+		font-size: x-small;
+	}
+
 }
 
 .main-container {
@@ -118,80 +203,11 @@ hr {
 	bottom: 0;
 }
 
-.video-dropdown {
-	left: auto;
-	margin-left: -60px;
-	margin-top: 10px;
-	padding: 0;
-
-	&:after {
-		left: 75px !important;
-		top: -5px !important;
-		border-bottom-color: black !important;
-	}
-
-	&:before {
-		left: 75px !important;
-		top: -5px !important;
-		border-bottom-color: black !important;
-	}
-
-
-	li {
-		height: 100px;
-		padding: 0;
-
-		.img {
-			width: 160px;
-		}
-	}
-}
-
-.volume-dropdown {
-	width: 20px;
-	min-width: 0;
-	padding: 3px;
-	left: 5px;
-
-	&:after {
-		left: 8px !important;
-	}
-
-	.progress {
-		width: 20px;
-		height: 100px;
-		margin: 0;
-		position: relative;
-		cursor: pointer;
-
-		.bar {
-			width: 100%;
-			height: auto;
-			position: absolute;
-			bottom: 0;
-		}
-	}
-}
 
 .icon-video-loader {
 	background-image: url('/images/video-loader.gif');
 	background-position: 0 0;
 }
 
-#current-title {
-	color: white;
-	font-weight: bold;
-	width: 250px;
-	height: 15px;
-	margin: 5px 0 5px;
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-}
 
-#current-progress {
-	width: 250px;
-	height: 7px;
-	margin: 0;
-}
 

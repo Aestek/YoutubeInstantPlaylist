@@ -49,12 +49,14 @@ html(lang='en', ng-app='app')
 				player-state='playback.playerState',
 				volume='playback.volume',
 				mute='playback.mute',
-				seek-to='playback.seekTo'
+				seek-to='playback.seekTo',
+				quality-levels='playback.qualityLevels',
+				current-quality='playback.currentQuality'
 			)
 
 		#video-overlay
 
-		.navbar.navbar-inverse
+		#main-navbar.navbar.navbar-inverse
 			.navbar-inner.navbar-fixed-top
 				span.brand YoutubeInstantPlaylist
 
@@ -104,12 +106,31 @@ html(lang='en', ng-app='app')
 					li.divider-vertical
 
 					li
-						#current-title{{playback.currentVideo.title}}
-						#current-progress.progress(
+						a(data-hover='dropdown', data-toggle="dropdown") {{displayQualities[playback.currentQuality] || 'Default'}}
+						ul.dropdown-menu.quality-dropdown
+							li(
+								ng-repeat='quality in playback.qualityLevels',
+								ng-class='{active: quality == playback.currentQuality}'
+							)
+								a(ng-click='setQuality(quality)') {{displayQualities[quality]}}
+							li
+								a(ng-click='setQuality("default")') Default
+
+					li.divider-vertical
+
+					li(ng-show='playback.currentVideo.id')
+						p.navbar-text.video-time {{playback.currentElapsedTime | secToTime}}
+
+					li(ng-show='playback.currentVideo.id')
+						.current-title(title='{{playback.currentVideo.title}}') {{playback.currentVideo.title}}
+						.current-progress.progress(
 							horizontal-progress-bar='{{playback.currentElapsedTime / playback.currentVideo.duration * 100}}', 
 							change='seekTo(value)'
 						)
 							.bar.bar-success
+
+					li(ng-show='playback.currentVideo.id')
+						p.navbar-text.video-time {{playback.currentVideo.duration | secToTime}}
 
 				div(ng-controller='UserCtrl')
 					ul.nav.pull-right(ng-show='!user.infos')

@@ -16,7 +16,9 @@ function MainCtrl($scope, videoStore) {
 		playerState: 5,
 		volume: 80,
 		mute: false,
-		seekTo: -1
+		seekTo: -1,
+		qualityLevels: [],
+		currentQuality: ''
 	};
 
 	// methods
@@ -35,8 +37,6 @@ function MainCtrl($scope, videoStore) {
 	$scope.setIndex = function(i) {
 		if (i < $scope.playlist.items.length && i >= 0)
 			$scope.playback.position = i;
-		else
-			$scope.playback.position = -1;
 	};
 
 	$scope.removeAt = function(i) {
@@ -106,6 +106,15 @@ function MainCtrl($scope, videoStore) {
 }
 
 function PlayerControlsCtrl($scope) {
+	$scope.displayQualities = {
+		highres: 'Original',
+		hd1080: '1080p',
+		hd720: '720p',
+		large: '480p',
+		medium: '360p',
+		small: '240p'
+	};
+
 	$scope.togglePlay = function() {
 		if ($scope.playback.currentVideo.id)
 			$scope.playback.playerState = $scope.playback.playerState <= 1 ? 2 : 1;
@@ -121,6 +130,10 @@ function PlayerControlsCtrl($scope) {
 
 	$scope.seekTo = function(p) {
 		$scope.playback.seekTo = p * $scope.playback.currentVideo.duration / 100;
+	};
+
+	$scope.setQuality = function(q) {
+		$scope.playback.currentQuality = q;
 	};
 
 	$scope.$watch('playback.volume', function() {
