@@ -35,6 +35,11 @@ html(lang='en', ng-app='app')
 
 	body(ng-controller='MainCtrl')
 
+		script(type='text/ng-template', id='video-tmpl')
+			.img(back-img='{{video.thumbnail.hqDefault}}', ng-transclude)
+				.title-container {{video.title}}
+				.duration {{video.duration | secToTime}}
+
 		// player
 		.player-container.hidden
 			div(
@@ -43,7 +48,8 @@ html(lang='en', ng-app='app')
 				current-time='playback.currentElapsedTime',
 				player-state='playback.playerState',
 				volume='playback.volume',
-				mute='playback.mute'
+				mute='playback.mute',
+				seek-to='playback.seekTo'
 			)
 
 		#video-overlay
@@ -56,46 +62,54 @@ html(lang='en', ng-app='app')
 					li
 						a.dropdown-toggle(
 							ng-click='playback.mute = !playback.mute'
-							data-hover='dropdown'
+							data-hover='dropdown',
+							data-target="#"
 						)
 							i.icon-white(
 								ng-class='{"icon-volume-up" : playback.volume > 50 && !playback.mute, "icon-volume-down" : playback.volume <= 50  && !playback.mute, "icon-volume-off": playback.mute}'
 							)
 						ul.dropdown-menu.volume-dropdown
-							li 
-								.progress(vertical-progress-bar='playback.volume', no-click)
-									.bar
+							li(no-click)
+								.progress(vertical-progress-bar='playback.volume')
+									.bar.bar-success
 
 					li.divider-vertical
 
-					li
-						a.navbar-btn(
+					li(ng-class='{disabled:playback.position <= 0}')
+						a.dropdown-toggle(
 							ng-click='previous()',
-							ng-class='{disabled:playback.position <= 0}'
+							data-hover='dropdown',
+							data-target="#"
 						)
 							i.icon-white.icon-step-backward
+
+						ul.dropdown-menu.video-dropdown
+							li(video-thumbnail='playlist.items[playback.position -1].video')
 					li
 						a(ng-class='{disabled: playlist.items.length == 0}')
 							i.icon-white(
-								ng-class='{"icon-pause": playback.playerState == 1, "icon-video-loader": playback.playerState == 3, "icon-play": playback.playerState == 2 || playback.playerState == 5}',
+								ng-class='{"icon-pause": playback.playerState == 1 || playback.playerState == -1, "icon-video-loader": playback.playerState == 3, "icon-play": playback.playerState == 2 || playback.playerState == 5 || playback.playerState == 4}',
 								ng-click='togglePlay()'
 							)
-					li
-						a(
+					li(ng-class='{disabled: playlist.items.length - 1 <= playback.position || playlist.items.length == 0}')
+						a.dropdown-toggle(
 							ng-click='next()',
-							ng-class='{disabled: playlist.items.length - 1 <= playback.position || playlist.items.length == 0}'
+							data-hover='dropdown',
+							data-target="#"
 						)
 							i.icon-white.icon-step-forward
+						ul.dropdown-menu.video-dropdown
+							li(video-thumbnail='playlist.items[playback.position + 1].video')
 
 					li.divider-vertical
 
 					li
-						p.navbar-text.current-title(
-							background-progressbar, 
-							fgcolor='rgba(255, 255, 255, 0.4)', 
-							bgcolor='transparent', 
-							progress='playback.currentElapsedTime / playback.currentVideo.duration * 100'
-						) {{playback.currentVideo.title}}
+						#current-title{{playback.currentVideo.title}}
+						#current-progress.progress(
+							horizontal-progress-bar='{{playback.currentElapsedTime / playback.currentVideo.duration * 100}}', 
+							change='seekTo(value)'
+						)
+							.bar.bar-success
 
 				div(ng-controller='UserCtrl')
 					ul.nav.pull-right(ng-show='!user.infos')

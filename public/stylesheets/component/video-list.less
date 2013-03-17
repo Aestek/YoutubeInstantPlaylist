@@ -4,102 +4,102 @@
 	padding: 0px;
 
 	li {
-		margin: 5px;
 		float: left;
+		margin: 5px;
 		cursor: pointer;
-		background: white;
-		.shadow(#656565, 5px);
-		.height-minus100(4px);
+	}
+}
 
-		&:hover {
-			.title-container {
-				display: none;
-			}
+.horizontal-video-list li, [video-thumbnail] {
+	background: white;
+	.shadow(#656565, 5px);
+	.height-minus100(4px);
 
-			.img .buttons {
-				display: block;
-			}
+	&:hover {
+		.title-container {
+			display: none;
 		}
 
-		&.playing {
-			.height-minus100(15px);
-			border-bottom: 10px solid @playingColor;
+		.img .buttons {
+			display: block;
 		}
-
-		.img {
-			position: relative;
-			border: 0;
-			width: 200px;
-			height: 100%;
-			background-position: 50% 50%;
-			background-repeat: no-repeat;
-			background-size: cover;
-			background-color: black;
-			padding: 0px;
-
-			.title-container {
-
-				max-height: 43px;
-
-				font-size: small;
-				color: white;
-				font-weight: bold;
-				text-align: center;
-				background: rgba(0, 0, 0, 0.8);
-				line-height: 13px;
-				padding: 2px 1px 3px;
-				max-height: 2.95em;
-				overflow: hidden;
-				text-shadow: 0px 0px 3px #000000;
-				
-			}
-
-			.buttons {
-				display: none;
-				float: right;
-			}
-
-			.duration {
-				position: absolute;
-				left: 80px;
-				bottom: 3px;
-				.rounded-corners(2px);
-				background: rgba(0, 0, 0, 0.8);
-				color: white;
-				font-size: x-small;
-				padding: 0px 5px;
-			}
-
-			.addedBy {
-				height: 50px;
-				width: 50px;
-				position: absolute;
-				bottom: 0;
-				right: 0;
-			}
-
-			.playlist-id {
-				position: absolute;
-				bottom: 0;
-				left: 0;
-				height: 20px;
-				padding: 5px;
-				background: rgba(0,0,0, 0.8);
-				-webkit-border-top-right-radius: 3px;
-				-moz-border-radius-topright: 3px;
-				border-top-right-radius: 3px;
-				color: white;
-				font-size: x-large;
-			}
-
-			&:hover .pId {
-				display: none;
-			}
-		}
-
-	
 	}
 
+	&.playing {
+		.height-minus100(15px);
+		border-bottom: 10px solid @playingColor;
+	}
+
+	.img {
+		position: relative;
+		border: 0;
+		width: 200px;
+		height: 100%;
+		background-position: 50% 50%;
+		background-repeat: no-repeat;
+		background-size: cover;
+		background-color: black;
+		padding: 0px;
+
+		.title-container {
+
+			max-height: 43px;
+
+			font-size: small;
+			color: white;
+			font-weight: bold;
+			text-align: center;
+			background: rgba(0, 0, 0, 0.8);
+			line-height: 13px;
+			padding: 2px 1px 3px;
+			max-height: 2.95em;
+			overflow: hidden;
+			text-shadow: 0px 0px 3px #000000;
+			
+		}
+
+		.buttons {
+			display: none;
+			float: right;
+		}
+
+		.duration {
+			position: absolute;
+			left: 80px;
+			bottom: 3px;
+			.rounded-corners(2px);
+			background: rgba(0, 0, 0, 0.8);
+			color: white;
+			font-size: x-small;
+			padding: 0px 5px;
+		}
+
+		.addedBy {
+			height: 50px;
+			width: 50px;
+			position: absolute;
+			bottom: 0;
+			right: 0;
+		}
+
+		.playlist-id {
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			height: 20px;
+			padding: 5px;
+			background: rgba(0,0,0, 0.8);
+			-webkit-border-top-right-radius: 3px;
+			-moz-border-radius-topright: 3px;
+			border-top-right-radius: 3px;
+			color: white;
+			font-size: x-large;
+		}
+
+		&:hover .pId {
+			display: none;
+		}
+	}
 }
 
 .vertical-video-list {

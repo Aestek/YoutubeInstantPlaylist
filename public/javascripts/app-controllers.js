@@ -15,7 +15,8 @@ function MainCtrl($scope, videoStore) {
 		playing: false,
 		playerState: 5,
 		volume: 80,
-		mute: false
+		mute: false,
+		seekTo: -1
 	};
 
 	// methods
@@ -28,7 +29,6 @@ function MainCtrl($scope, videoStore) {
 		}) - 1;
 		if (i == 0)
 			$scope.setIndex(0);
-		console.log(new Date().getTime());
 		return i;
 	};
 
@@ -108,7 +108,7 @@ function MainCtrl($scope, videoStore) {
 function PlayerControlsCtrl($scope) {
 	$scope.togglePlay = function() {
 		if ($scope.playback.currentVideo.id)
-			$scope.playback.playerState = $scope.playback.playerState == 1 ? 2 : 1;
+			$scope.playback.playerState = $scope.playback.playerState <= 1 ? 2 : 1;
 	};
 
 	$scope.next = function() {
@@ -117,6 +117,10 @@ function PlayerControlsCtrl($scope) {
 
 	$scope.previous = function() {
 		$scope.setIndex($scope.playback.position - 1);
+	};
+
+	$scope.seekTo = function(p) {
+		$scope.playback.seekTo = p * $scope.playback.currentVideo.duration / 100;
 	};
 
 	$scope.$watch('playback.volume', function() {

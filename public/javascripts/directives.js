@@ -1,6 +1,18 @@
 
 // directive wrapper for the tinyscrollbar jQuery plugin
 
+app.directive('videoThumbnail', function() {
+	return {
+		restrict: 'A',
+		replace: false,
+		transclude: true,
+		templateUrl: 'video-tmpl',
+		scope: {
+			video: '=videoThumbnail'
+		}
+	};
+});
+
 app.directive('scrollable', function() {
 	return function(scope, element, attrs) {
 		var $el = $(element);
@@ -33,7 +45,8 @@ app.directive('youtubePlayer', function() {
      		currentTime: '=',
      		playerState: '=',
      		volume: '=',
-     		mute: '='
+     		mute: '=',
+     		seekTo: '='
      	},
      	controller: function($scope, $element, guid) {
      		var $el = $($element);
@@ -44,7 +57,7 @@ app.directive('youtubePlayer', function() {
 
 			// YoutubePlayer requires a video id to load
 		    var att = { 
-		    	data: 'http://www.youtube.com/v/K-aERDSzU10?enablejsapi=1&controls=0&modestbranding=0&rel=0&playerapiid=' + container,
+		    	data: 'http://www.youtube.com/v/K-aERDSzU10?enablejsapi=1&autoplay=0&controls=0&modestbranding=0&rel=0&playerapiid=' + container,
 		    	width: '100%', 
 		    	height: '100%' 
 		    };
@@ -84,6 +97,7 @@ app.directive('youtubePlayer', function() {
 			    	}
 			    	else {
 			    		switchPlayerVisibility(false);
+			    		player.seekTo(0);
 			    		player.stopVideo();
 			    		player.clearVideo();
 			    	}
@@ -94,6 +108,7 @@ app.directive('youtubePlayer', function() {
 			    });
 
 			    $scope.$watch('playerState', function(val) {
+			    	console.log(val)
 			    	if (val == 1)
 			    		player.playVideo();
 			    	else if (val == 2)
@@ -105,6 +120,11 @@ app.directive('youtubePlayer', function() {
 			    		player.mute();
 			    	else
 			    		player.unMute();
+			    });
+
+			    $scope.$watch('seekTo', function(val) {
+			    	if (val != -1 && $scope.video.id)
+			    		player.seekTo(val);
 			    });
 			};
 
@@ -193,32 +213,59 @@ app.directive('verticalProgressBar', function() {
     	scope: {
       		value: '=verticalProgressBar'
      	},
-     	controller: function($scope, $element, guid) {
-     		$el = $($element);
-     		$bar = $el.find('.bar');
+     	link: function($scope, $element) {
+     		$ell = $($element);
+     		$barr = $ell.find('.bar');
 
      		function setProgress(y) {
      			$scope.$apply(function() {
-     				$scope.value = 100 - (y - $el.offset().top) / $el.height() * 100;
-     				$bar.css('height', $scope.value + '%');
+     				$scope.value = 100 - (y - $ell.offset().top) / $ell.height() * 100;
+     				$barr.css('height', $scope.value + '%');
      			});
      			
      		}
 
-     		$el.mousedown(function(e) {
+     		$ell.mousedown(function(e) {
      			setProgress(e.pageY);
 
-     			$el.mousemove(function(e) {
+     			$ell.mousemove(function(e) {
      				setProgress(e.pageY);
      			});
 
      			$(window).one('mouseup', function() {
-     				$el.unbind('mousemove');
+     				$ell.unbind('mousemove');
      			});
      		});
 
      		$scope.$watch('value', function() {
-     			$bar.css('height', $scope.value + '%');
+     			$barr.css('height', $scope.value + '%');
+     		});
+     	}
+    };
+});
+
+app.directive('horizontalProgressBar', function() {
+	return {
+    	restrict: 'A',
+     	replace: false,
+    	scope: {
+      		value: '@horizontalProgressBar',
+      		change: '&'
+     	},
+     	link: function($scope, $element) {
+     		$el = $($element);
+     		$bar = $el.find('.bar');
+
+     		function setProgress(x) {
+     			$scope.change({value: (x - $el.offset().left) / $el.width() * 100});
+     		}
+
+     		$el.mouseup(function(e) {
+     			setProgress(e.pageX);
+     		});
+
+     		$scope.$watch('value', function(val) {
+     			$bar.css('width', val + '%');
      		});
      	}
     };
