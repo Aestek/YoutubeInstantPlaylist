@@ -119,7 +119,6 @@ app.directive('youtubePlayer', function() {
 			    	if (val == 1) {
 			    		player.playVideo();
 			    		$scope.qualityLevels = player.getAvailableQualityLevels();
-			    		console.log($scope.qualityLevels);
 			    	}
 			    	else if (val == 2)
 			    		player.pauseVideo();
@@ -228,47 +227,47 @@ app.directive('verticalProgressBar', function() {
       		value: '=verticalProgressBar'
      	},
      	link: function($scope, $element) {
-     		$ell = $($element);
-     		$barr = $ell.find('.bar');
+     		var $el = $($element);
+     		var $bar = $el.find('.bar');
 
      		function setProgress(y) {
      			$scope.$apply(function() {
-     				$scope.value = 100 - (y - $ell.offset().top) / $ell.height() * 100;
-     				$barr.css('height', $scope.value + '%');
+     				$scope.value = 100 - (y - $el.offset().top) / $el.height() * 100;
+     				$bar.css('height', $scope.value + '%');
      			});
      			
      		}
 
-     		$ell.mousedown(function(e) {
+     		$el.mousedown(function(e) {
      			setProgress(e.pageY);
 
-     			$ell.mousemove(function(e) {
+     			$el.mousemove(function(e) {
      				setProgress(e.pageY);
      			});
 
      			$(window).one('mouseup', function() {
-     				$ell.unbind('mousemove');
+     				$el.unbind('mousemove');
      			});
      		});
 
      		$scope.$watch('value', function() {
-     			$barr.css('height', $scope.value + '%');
+     			$bar.css('height', $scope.value + '%');
      		});
      	}
     };
 });
 
-app.directive('horizontalProgressBar', function() {
+app.directive('songProgressBar', function() {
 	return {
     	restrict: 'A',
      	replace: false,
     	scope: {
-      		value: '@horizontalProgressBar',
+      		value: '@songProgressBar',
       		change: '&'
      	},
      	link: function($scope, $element) {
-     		$el = $($element);
-     		$bar = $el.find('.bar');
+     		var $el = $($element);
+     		var $bar = $el.find('.bar');
 
      		function setProgress(x) {
      			$scope.change({value: (x - $el.offset().left) / $el.width() * 100});

@@ -1465,6 +1465,7 @@ body {
   width: 250px;
   height: 7px;
   margin: 0;
+  cursor: pointer;
 }
 #main-navbar .video-time {
   margin: 22px 5px 0;

@@ -124,7 +124,7 @@ html(lang='en', ng-app='app')
 					li(ng-show='playback.currentVideo.id')
 						.current-title(title='{{playback.currentVideo.title}}') {{playback.currentVideo.title}}
 						.current-progress.progress(
-							horizontal-progress-bar='{{playback.currentElapsedTime / playback.currentVideo.duration * 100}}', 
+							song-progress-bar='{{playback.currentElapsedTime / playback.currentVideo.duration * 100}}', 
 							change='seekTo(value)'
 						)
 							.bar.bar-success
