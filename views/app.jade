@@ -96,8 +96,7 @@ html(lang='en', ng-app='app')
 					li(ng-class='{disabled: playlist.items.length - 1 <= playback.position || playlist.items.length == 0}')
 						a.dropdown-toggle(
 							ng-click='next()',
-							data-hover='dropdown',
-							data-target="#"
+							data-hover='dropdown'
 						)
 							i.icon-white.icon-step-forward
 						ul.dropdown-menu.video-dropdown
@@ -106,31 +105,33 @@ html(lang='en', ng-app='app')
 					li.divider-vertical
 
 					li
-						a(data-hover='dropdown', data-toggle="dropdown") {{displayQualities[playback.currentQuality] || 'Default'}}
+						a(data-hover='dropdown') 
+							i.icon-white.icon-cog
+						
 						ul.dropdown-menu.quality-dropdown
-							li(
-								ng-repeat='quality in playback.qualityLevels',
-								ng-class='{active: quality == playback.currentQuality}'
-							)
-								a(ng-click='setQuality(quality)') {{displayQualities[quality]}}
-							li
-								a(ng-click='setQuality("default")') Default
+							li.dropdown-submenu
+								a {{displayQualities[playback.currentQuality] || 'Default'}}
+
+								ul.dropdown-menu
+									li(
+										ng-repeat='quality in playback.qualityLevels',
+										ng-class='{active: quality == playback.currentQuality}'
+									)
+										a(ng-click='setQuality(quality)') {{displayQualities[quality]}}
+									li
+										a(ng-click='setQuality("default")') Default
 
 					li.divider-vertical
 
 					li(ng-show='playback.currentVideo.id')
-						p.navbar-text.video-time {{playback.currentElapsedTime | secToTime}}
-
-					li(ng-show='playback.currentVideo.id')
 						.current-title(title='{{playback.currentVideo.title}}') {{playback.currentVideo.title}}
+						.video-time {{playback.currentElapsedTime | secToTime}}
 						.current-progress.progress(
 							song-progress-bar='{{playback.currentElapsedTime / playback.currentVideo.duration * 100}}', 
 							change='seekTo(value)'
 						)
 							.bar.bar-success
-
-					li(ng-show='playback.currentVideo.id')
-						p.navbar-text.video-time {{playback.currentVideo.duration | secToTime}}
+						.video-time {{playback.currentVideo.duration | secToTime}}
 
 				div(ng-controller='UserCtrl')
 					ul.nav.pull-right(ng-show='!user.infos')

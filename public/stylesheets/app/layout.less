@@ -12,15 +12,16 @@ html, body {
 
 #main-navbar {
 	.dropdown-menu {
-		left: auto;
+		min-width: 0;
+		
 	}
 
 	.quality-dropdown {
-		min-width: 0;
+		left: auto;
+		margin-left: 5px;
 	}
 
 	.video-dropdown {
-		left: auto;
 		margin-left: -60px;
 		margin-top: 10px;
 		padding: 0;
@@ -77,25 +78,28 @@ html, body {
 	.current-title {
 		color: white;
 		font-weight: bold;
-		width: 250px;
-		height: 15px;
-		margin: 5px 0 5px;
+		width: 310px;
+		height: 18px;
+		margin: 3px 5px 0;
 		overflow: hidden;
 		white-space: nowrap;
 		text-overflow: ellipsis;
 	}
 
 	.current-progress {
+		display: inline-block;
 		width: 250px;
-		height: 7px;
+		height: 9px;
 		margin: 0;
 		cursor: pointer;
 	}
 
 	.video-time {
-		margin: 22px 5px 0;
+		display: inline-block;
+		margin: 0 5px 0;
 		line-height: 15px;
 		font-size: x-small;
+		color: #999999;
 	}
 
 }
