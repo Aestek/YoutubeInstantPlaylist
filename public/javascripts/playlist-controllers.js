@@ -7,6 +7,7 @@ function SearchCtrl($scope, videoStore) {
 	// methods
 	$scope.search = function(q) {
 		videoStore.search(q, function(result) {
+			console.log(result);
 			$scope.searchResults = result.items || [];
 		});
 	};

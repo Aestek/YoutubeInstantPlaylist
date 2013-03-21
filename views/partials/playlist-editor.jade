@@ -31,8 +31,11 @@
 							.img(back-img='{{result.thumbnail.hqDefault}}')
 								.length {{result.duration | secToTime}}
 							.title {{result.title}}
+							.progress
+								.bar.bar-success(style='width: {{result.rating * 20}}%')
+								.bar.bar-danger(style='width: {{100 - result.rating * 20}}%')
 							.infos
-								| Views : {{result.viewCount}}
+								| Views : {{result.viewCount | commaSeparateNumber}}
 
 // infos
 

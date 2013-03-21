@@ -51,7 +51,8 @@ html(lang='en', ng-app='app')
 				mute='playback.mute',
 				seek-to='playback.seekTo',
 				quality-levels='playback.qualityLevels',
-				current-quality='playback.currentQuality'
+				current-quality='playback.currentQuality',
+				percentage-loaded='playback.percentageLoaded'
 			)
 
 		#video-overlay
@@ -110,7 +111,7 @@ html(lang='en', ng-app='app')
 						
 						ul.dropdown-menu.quality-dropdown
 							li.dropdown-submenu
-								a {{displayQualities[playback.currentQuality] || 'Default'}}
+								a {{displayQualities[playback.currentQuality] || 'Quality'}}
 
 								ul.dropdown-menu
 									li(

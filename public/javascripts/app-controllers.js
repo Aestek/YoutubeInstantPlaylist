@@ -18,7 +18,8 @@ function MainCtrl($scope, videoStore) {
 		mute: false,
 		seekTo: -1,
 		qualityLevels: [],
-		currentQuality: ''
+		currentQuality: '',
+		percentageLoaded: 0
 	};
 
 	// methods

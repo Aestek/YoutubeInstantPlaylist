@@ -49,7 +49,8 @@ app.directive('youtubePlayer', function() {
      		mute: '=',
      		seekTo: '=',
      		qualityLevels: '=',
-     		currentQuality: '='
+     		currentQuality: '=',
+     		percentageLoaded: '='
      	},
      	controller: function($scope, $element, guid) {
      		var $el = $($element);
@@ -84,6 +85,7 @@ app.directive('youtubePlayer', function() {
 		    	setInterval(function() {
 		    		$scope.$apply(function() {
 		    			$scope.currentTime = player.getCurrentTime();
+		    			$scope.percentageLoaded = player.getVideoLoadedFraction();
 		    		});
 		    	}, 500);
 
