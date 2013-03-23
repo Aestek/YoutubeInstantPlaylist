@@ -9,7 +9,6 @@ var express = require('express')
 	, http = require('http')
 	, path = require('path')
 	, passport = require('passport')
-	, FacebookStrategy = require('passport-facebook').Strategy
 	, connect = require('connect')
 	, mongoose = require('mongoose')
 	, models = require('./lib/models')
@@ -58,6 +57,8 @@ app.get('/api/video/:id', apiRoutes.video);
 app.get('/api/uploader-videos/:id', apiRoutes.uploaderVideo);
 app.get('/api/search/', apiRoutes.search);
 app.get('/api/search-autocomplete/', apiRoutes.searchAutocomplete);
+app.post('/api/playlist/', apiRoutes.savePlaylist);
+app.get('/api/playlists/', apiRoutes.getPlaylists);
 
 require('./lib/passport')(app);
 

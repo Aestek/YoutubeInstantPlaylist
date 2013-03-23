@@ -12,14 +12,13 @@ function MainCtrl($scope, videoStore) {
 		currentVideo: {},
 		elapsedTime: 0,
 		currentElapsedTime: 0,
-		playing: false,
 		playerState: 5,
 		volume: 80,
 		mute: false,
 		seekTo: -1,
 		qualityLevels: [],
 		currentQuality: '',
-		percentageLoaded: 0
+		loadProgress: 0
 	};
 
 	// methods
@@ -60,6 +59,15 @@ function MainCtrl($scope, videoStore) {
 	$scope.removeAll = function() {
 		$scope.playlist.items = [];
 		$scope.playback.position = -1;
+	};
+
+	$scope.loadPlaylist = function(playlist) {
+		$scope.playlist = playlist;
+
+		if(playlist.items.length > 0) {
+			$scope.setIndex(0);
+			$scope.playback.playerState = 1;
+		}
 	};
 
 	// watcher

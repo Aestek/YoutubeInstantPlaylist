@@ -1775,6 +1775,24 @@ hr {
   left: 50%;
   margin-left: -50px;
 }
+input.playlist-title {
+  display: inline-block;
+  float: right;
+  margin-right: 10px;
+  box-shadow: none;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 1px dashed black;
+  background: transparent;
+  font-size: large;
+  color: white;
+  width: auto;
+}
+input.playlist-title:focus {
+  box-shadow: none;
+  border-color: #6fb827;
+}
 #video-description {
   height: calc(100% - 216px);
   height: -webkit-calc(100% - 216px);

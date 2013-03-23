@@ -162,6 +162,13 @@ div(ng-controller='RemoteCtrl')
 			i.icon-remove-sign.icon-white
 			|  Clear
 
+		button.btn.pull-right(
+			ng-click='savePlaylist()',
+			ng-disabled='!playlist.title'
+		) Save
+
+		input.playlist-title(type='text', placeholder='Playlits title', ng-model='playlist.title')
+
 	.block-content
 		div.no-content(ng-show='playlist.items.length == 0') Your playlist is empty :(
 		div(

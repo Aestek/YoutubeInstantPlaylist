@@ -52,7 +52,7 @@ html(lang='en', ng-app='app')
 				seek-to='playback.seekTo',
 				quality-levels='playback.qualityLevels',
 				current-quality='playback.currentQuality',
-				percentage-loaded='playback.percentageLoaded'
+				load-progress='playback.loadProgress'
 			)
 
 		#video-overlay
@@ -129,9 +129,9 @@ html(lang='en', ng-app='app')
 						.video-time {{playback.currentElapsedTime | secToTime}}
 						.current-progress.progress(
 							song-progress-bar='{{playback.currentElapsedTime / playback.currentVideo.duration * 100}}', 
+							load-progress='{{playback.loadProgress}}',
 							change='seekTo(value)'
 						)
-							.bar.bar-success
 						.video-time {{playback.currentVideo.duration | secToTime}}
 
 				div(ng-controller='UserCtrl')

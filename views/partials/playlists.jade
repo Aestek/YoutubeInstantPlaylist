@@ -1,1 +1,8 @@
-p Hello
+.well.block-padding.col14.coloffset1.row16
+	a.btn.btn-success.btn-large.pull-right(href='#/playlist?new') New playlits
+	h2 My playlists ({{playlists.length}})
+	ul.playlist-list
+		li(
+			ng-repeat='playlist in playlists',
+			ng-click='loadPlaylist(playlist)'
+		) {{playlist.title}}

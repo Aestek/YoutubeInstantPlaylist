@@ -7,7 +7,6 @@ function SearchCtrl($scope, videoStore) {
 	// methods
 	$scope.search = function(q) {
 		videoStore.search(q, function(result) {
-			console.log(result);
 			$scope.searchResults = result.items || [];
 		});
 	};
@@ -54,39 +53,12 @@ function RemoteCtrl($scope, socket, guid, videoStore) {
 	});
 }
 
-function PlaylistCtrl($scope) {
-
-	/*// watchers
-
-	$scope.$watch('currentPosition', function() {
-		console.log('currentPosition playlist', $scope.playlist.position)
-		var c = 0;
-		for (var i in $scope.playlist) {
-			if (i < $scope.playlist.position)
-				c += $scope.playlist[i].video.duration;
-			else
-				break;
-		}
-
-		$scope.playedDuration = c;
-	});
-
-	$scope.$watch('playlist', function() {
-		var t = 0;
-		var found = false;
-		for (var i in $scope.playlist) {
-			t += $scope.playlist[i].video.duration;
-		}
-		$scope.totalDuration = t;
-
-	}, true);
-
-	$scope.$watch('currentTime + " " + playerState', function() {
-		if ($scope.totalDuration > 0)
-			$scope.playlistProgress = ($scope.playedDuration + $scope.currentTime) / $scope.totalDuration * 100;
-		else
-			$scope.playlistProgress = 0;
-	});*/
+function PlaylistCtrl($scope, $http) {
+	$scope.savePlaylist = function() {
+		$http.post('/api/playlist/', {
+			playlist: $scope.playlist
+		});
+	};
 }
 
 function VideoInfosCtrl($scope, videoStore) {

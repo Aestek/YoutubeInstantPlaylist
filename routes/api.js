@@ -1,5 +1,7 @@
 var request = require('request'),
-	async = require('async');
+	async = require('async'),
+	models = require('../lib/models')
+;
 
 var fetch = function(file,cb){
      request.get(file, function(err,response,body){
@@ -95,4 +97,42 @@ exports.searchAutocomplete = function(req, res) {
 			}
 		}
 	);
+};
+
+exports.savePlaylist = function(req, res) {
+	var playlist = new models.playlist(req.param('playlist'));
+	if (req.session.passport) {
+		var user = req.session.passport.user;
+
+		if (playlist._id) {
+			models.playlist.find({_id: playlist._id, user: user.id}, function(err, p) {
+				if (p) {
+					playlist.save(function (err, nPlaylist) {
+						res.send(nPlaylist);
+					});
+				}
+				else
+					res.send(403);
+			});
+		}
+		else {
+			playlist.user = user._id;
+			playlist.save(function (err, nPlaylist) {
+				res.send(nPlaylist);
+			});
+		}			
+	}
+	else
+		res.send(401);
+};
+
+exports.getPlaylists = function(req, res) {
+	if (req.session.passport) {
+		var user = req.session.passport.user;
+		models.playlist.findByUser(user, function(err, data) {
+			res.send(data);
+		});	
+	}
+	else
+		res.send(401);
 };
