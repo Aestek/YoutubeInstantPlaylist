@@ -5,7 +5,6 @@
 
 var express = require('express')
 	, routes = require('./routes')
-	, apiRoutes = require('./routes/api')
 	, http = require('http')
 	, path = require('path')
 	, passport = require('passport')
@@ -53,12 +52,7 @@ app.get('/app', routes.app);
 app.get('/remote', routes.remote);
 app.get('/partials/:id', routes.partials)
 
-app.get('/api/video/:id', apiRoutes.video);
-app.get('/api/uploader-videos/:id', apiRoutes.uploaderVideo);
-app.get('/api/search/', apiRoutes.search);
-app.get('/api/search-autocomplete/', apiRoutes.searchAutocomplete);
-app.post('/api/playlist/', apiRoutes.savePlaylist);
-app.get('/api/playlists/', apiRoutes.getPlaylists);
+require('./lib/api')(app);
 
 require('./lib/passport')(app);
 

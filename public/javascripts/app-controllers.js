@@ -1,4 +1,4 @@
-function MainCtrl($scope, videoStore) {
+function MainCtrl($scope, api, $rootScope) {
 
 	// properties
 
@@ -76,7 +76,7 @@ function MainCtrl($scope, videoStore) {
 		$scope.playback.currentVideo = ($scope.playlist.items[$scope.playback.position] || {}).video || {};
 
 		if (!$scope.playback.currentVideo.relatedVideos && $scope.playback.currentVideo.id)
-			videoStore.get($scope.playback.currentVideo.id, function(v) {
+			api.videos.get({id:$scope.playback.currentVideo.id}, function(v) {
 				$scope.playback.currentVideo = v;
 			});
 
@@ -112,6 +112,11 @@ function MainCtrl($scope, videoStore) {
 		$scope.playlist.totalTime = duration;
 		$scope.playback.elapsedTime = currentDuration;
 	}, true);
+
+	$rootScope.$on('authRequired', function(ev, arg) {
+		console.log(arg);
+		alert('authRequired');
+	});
 }
 
 function PlayerControlsCtrl($scope) {

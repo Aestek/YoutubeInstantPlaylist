@@ -1,72 +1,73 @@
 // main api service
 
-app.factory('videoStore', function($http, $cacheFactory) {
-	var caches = {
-		video : $cacheFactory('video'),
-		uploaderVideo: $cacheFactory('uploaderVideo'),
-		search : $cacheFactory('search'),
-		searchAutocomplete: $cacheFactory('searchAutocomplete')
-	};
+app.factory('api', function($http, $cacheFactory, $rootScope) {
+	var api = {};
+	var verbs = ['get', 'post', 'put', 'delete'];
 
-	function getCacheGeneric(type, id, fallback, callback) {
-		var e = caches[type].get(id);
-		if (e) {
-			callback(e);
-			return;
-		}
-		else
-			fallback(function(e) {
-				caches[type].put(id, e);
-				callback(e);
-			});
-	};
+	function constructUrl(url, params) {
+		params = params || {};
 
-	return {
-		search: function(q, callback) {
-			getCacheGeneric('search', q, function(fn) {
-				$http.get('/api/search/', {
-					params: {
-						q: q
-					}
-				}).success(function(data) {
-					fn(data);
-				});
-			}, function(e) {
-				callback(e);
-			});
-		},
-		searchAutocomplete: function(q, callback) {
-			getCacheGeneric('searchAutocomplete', q, function(fn) {
-				$http.get('/api/search-autocomplete/', {
-					params: {
-						q: q
-					}
-				}).success(function(data) {
-					fn(data);
-				});
-			}, function(e) {
-				callback(e);
-			});
-		},
-		get: function(id, callback) {
-			getCacheGeneric('video', id, function(fn) {
-				$http.get('/api/video/' + id).success(function(data) {
-					fn(data);
-				});
-			}, function(e) {
-				callback(e);
-			});
-		},
-		uploaderVideos: function(id, callback) {
-			getCacheGeneric('uploaderVideo', id, function(fn) {
-				$http.get('/api/uploader-videos/' + id).success(function(data) {
-					fn(data);
-				});
-			}, function(e) {
-				callback(e);
-			});
+		url = url.replace(/:(\w+)(\??)/gi, function(u, p) {
+			if (params[p]) {
+				var v = params[p];
+				delete params[p];
+				return v;
+			}
+			else
+				return '';
+		}).replace(/\/\//g, '/');
+
+		return {
+			url: url,
+			params: params
+		};
+	}
+
+	function resolveEls(els, container) {
+		for (var i in els) {
+			container[i] = {};
+
+			for (var j in verbs) {
+				if (els[i][verbs[j]])
+					(function(i, j) {
+						container[i][verbs[j]] = function() {
+							var params = arguments.length == 2 ? arguments[0] : null;
+							var cb = arguments.length == 2 ? arguments[1] : arguments[0];
+							var urlConfig = constructUrl(els[i].uri, params);
+							$http({
+								url: urlConfig.url,
+								params: urlConfig.params,
+								method: verbs[j],
+								cache: els[i].cache
+							}).success(function(data, status, headers, config) {
+								if (cb)
+									cb(data);
+							}).error(function(data, status, headers, config) {
+								if (status == 401)
+									$rootScope.$emit('authRequired', {
+										uri: urlConfig.url,
+										method: verbs[j],
+										statusCode: status,
+										retry: function() {
+											container[i][verbs[j]](arguments[0], arguments[1]);
+										}
+									});
+								if (cb)
+									cb(null, data);
+							});
+						};
+					})(i, j);
+			}
+
+			if (els[i].next)
+				resolveEls(els[i].next, container[i])
 		}
 	}
+	resolveEls(apiManifest, api);
+
+	console.log(api)
+
+	return api;
 });
 
 // guid service

@@ -1,4 +1,4 @@
-function SearchCtrl($scope, videoStore) {
+function SearchCtrl($scope, api) {
 
 	// properties
 	$scope.searchResults = -1;
@@ -6,19 +6,19 @@ function SearchCtrl($scope, videoStore) {
 
 	// methods
 	$scope.search = function(q) {
-		videoStore.search(q, function(result) {
+		api.videos.search.get({q: q}, function(result) {
 			$scope.searchResults = result.items || [];
 		});
 	};
 
 	$scope.findAutocomplete = function(q, cb) {
-		videoStore.searchAutocomplete(q, function(result) {
+		api.videos.search.suggest.get({q: q}, function(result) {
 			cb(result);
 		});
 	};
 }
 
-function RemoteCtrl($scope, socket, guid, videoStore) {
+function RemoteCtrl($scope, socket, guid) {
 
 	// properties
 	$scope.roomId = guid.get();
@@ -53,19 +53,20 @@ function RemoteCtrl($scope, socket, guid, videoStore) {
 	});
 }
 
-function PlaylistCtrl($scope, $http) {
+function PlaylistCtrl($scope, api) {
 	$scope.savePlaylist = function() {
-		$http.post('/api/playlist/', {
-			playlist: $scope.playlist
-		});
+		if ($scope.playlist._id)
+			api.playlists.put({id: $scope.playlist._id, playlist: $scope.playlist});
+		else
+			api.playlists.post({playlist: $scope.playlist});
 	};
 }
 
-function VideoInfosCtrl($scope, videoStore) {
+function VideoInfosCtrl($scope, api) {
 	$scope.uploaderVideos = [];
 	$scope.$watch('playback.currentVideo', function(val) {
 		if (val.id) 
-			videoStore.uploaderVideos(val.uploader, function(data) {
+			api.videos.fromUploader.get({name: val.uploader}, function(data) {
 				$scope.uploaderVideos = data;
 			});
 	});

@@ -24,6 +24,7 @@ html(lang='en', ng-app='app')
 		script
 			var sessionUser = !{user};
 
+		script(src='/api/manifest?var=apiManifest', type='text/javascript')
 		script(src='javascripts/app.js', type='text/javascript')
 		script(src='javascripts/services.js', type='text/javascript')
 		script(src='javascripts/app-controllers.js', type='text/javascript')

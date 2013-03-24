@@ -1,7 +1,7 @@
-function PlaylistsCtrl($scope, $http) {
+function PlaylistsCtrl($scope, api) {
 	$scope.playlists = [];
 
-	$http.get('/api/playlists/').success(function(data) {
+	api.user.playlists.get(function(data) {
 		$scope.playlists = data;
 	});
 }

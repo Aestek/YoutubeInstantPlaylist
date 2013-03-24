@@ -116,7 +116,6 @@ app.directive('youtubePlayer', function() {
 				});
 
 				$scope.$watch('playerState', function(val) {
-					console.log(val);
 					if (val == 1) {
 						player.playVideo();
 						$scope.qualityLevels = player.getAvailableQualityLevels();
@@ -269,7 +268,7 @@ app.directive('songProgressBar', function() {
 	 	},
 	 	compile: function(el) {
 	 		var songProgressEl = angular.element('<div class="bar bar-success" />');
-	 		var loadProgressEl = angular.element('<div class="bar" />');
+	 		var loadProgressEl = angular.element('<div class="bar bar-load" />');
 
 	 		el.append(songProgressEl).append(loadProgressEl);
 

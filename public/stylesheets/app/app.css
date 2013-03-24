@@ -1476,6 +1476,9 @@ body {
   font-size: x-small;
   color: #999999;
 }
+#main-navbar .bar-load {
+  opacity: 0.3;
+}
 .main-container {
   position: absolute;
   top: 42px;
@@ -1756,6 +1759,26 @@ hr {
   height: 5px;
   margin: 3px 5px 0 0;
   max-width: 200px;
+}
+.playlist-list {
+  list-style-type: none;
+  margin: 30px 15px;
+}
+.playlist-list > li {
+  margin: 20px 0;
+  cursor: pointer;
+}
+.playlist-list > li .title {
+  font-size: xx-large;
+  margin-bottom: 10px;
+}
+.playlist-list > li .title .video-count {
+  font-size: medium;
+}
+.playlist-list > li .horizontal-video-list {
+  height: 100px;
+  padding: 5px 0;
+  overflow: hidden;
 }
 #playlistPosition {
   font-size: xx-large;
