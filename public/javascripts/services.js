@@ -65,9 +65,51 @@ app.factory('api', function($http, $cacheFactory, $rootScope) {
 	}
 	resolveEls(apiManifest, api);
 
-	console.log(api)
-
 	return api;
+});
+
+var authComplete;
+app.factory('auth', function($rootScope, api, $location) {
+	var authStrategies = {
+		facebook: function(cb) {
+			authComplete = function(authData) {
+				var state = {
+					authenticated: !!authData,
+					profile: authData 
+				};
+				userStateChanged(state);
+				cb(state);
+			};
+			popitup('/auth/facebook/');
+		}
+	};
+
+	var auth = {
+		login: function(strategy, arg1, arg2) {
+			authStrategies[strategy](arg1, arg2);
+		},
+		userState: {
+			authenticated: false,
+			profile: {}
+		}
+	};
+
+	function userStateChanged(userData) {
+		auth.userState = userData;
+		$rootScope.$emit('userStateChanged', userData);
+	}
+
+	function popitup(url) {
+		newwindow=window.open(url,'authPopup','height=500,width=888');
+		if (window.focus) {newwindow.focus()}
+		return false;
+	}	
+
+	api.me.status.get(function(status) {
+		userStateChanged(status);
+	});
+
+	return auth;
 });
 
 // guid service

@@ -1,4 +1,4 @@
-function MainCtrl($scope, api, $rootScope) {
+function MainCtrl($scope, api, $rootScope, $location, auth) {
 
 	// properties
 
@@ -19,6 +19,11 @@ function MainCtrl($scope, api, $rootScope) {
 		qualityLevels: [],
 		currentQuality: '',
 		loadProgress: 0
+	};
+
+	$scope.userSate = {
+		authenticated : false,
+		infos: {}
 	};
 
 	// methods
@@ -113,9 +118,13 @@ function MainCtrl($scope, api, $rootScope) {
 		$scope.playback.elapsedTime = currentDuration;
 	}, true);
 
+	$rootScope.$on('userStateChanged', function(ev, arg) {
+		console.log(arg)
+		$scope.userState = arg;
+	});
+	
 	$rootScope.$on('authRequired', function(ev, arg) {
-		console.log(arg);
-		alert('authRequired');
+		$location.path('/login')
 	});
 }
 
@@ -153,8 +162,4 @@ function PlayerControlsCtrl($scope) {
 	$scope.$watch('playback.volume', function() {
 		$scope.playback.mute = false;
 	});
-}
-
-function UserCtrl($scope) {
-	$scope.user = sessionUser;
 }
