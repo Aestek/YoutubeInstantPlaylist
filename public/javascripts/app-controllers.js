@@ -1,4 +1,4 @@
-function MainCtrl($scope, api, $rootScope, $location, auth) {
+function MainCtrl($scope, api, $rootScope, $location) {
 
 	// properties
 
@@ -19,11 +19,6 @@ function MainCtrl($scope, api, $rootScope, $location, auth) {
 		qualityLevels: [],
 		currentQuality: '',
 		loadProgress: 0
-	};
-
-	$scope.userSate = {
-		authenticated : false,
-		infos: {}
 	};
 
 	// methods
@@ -117,14 +112,26 @@ function MainCtrl($scope, api, $rootScope, $location, auth) {
 		$scope.playlist.totalTime = duration;
 		$scope.playback.elapsedTime = currentDuration;
 	}, true);
+}
+
+function UserStateCtrl($scope, $rootScope, $location, api, auth) {
+	var baseState = {
+		authenticated : false,
+		infos: {}
+	};
+
+	$scope.userSate = baseState;
+
+	$scope.logout = function() {
+		auth.logout();
+	};
 
 	$rootScope.$on('userStateChanged', function(ev, arg) {
-		console.log(arg)
 		$scope.userState = arg;
 	});
 	
 	$rootScope.$on('authRequired', function(ev, arg) {
-		$location.path('/login')
+		$location.path('/login?required')
 	});
 }
 
@@ -161,5 +168,41 @@ function PlayerControlsCtrl($scope) {
 
 	$scope.$watch('playback.volume', function() {
 		$scope.playback.mute = false;
+	});
+}
+
+
+function PlaylistCtrl($scope, api) {
+	$scope.savePlaylist = function() {
+		if ($scope.playlist._id)
+			api.playlists.put({id: $scope.playlist._id, playlist: $scope.playlist});
+		else
+			api.playlists.post({playlist: $scope.playlist});
+	};
+}
+
+function SearchCtrl($scope, api) {
+
+	// properties
+	$scope.searchResults = [];
+	$scope.searchQuery = '';
+
+
+	// methods
+	$scope.search = function(q) {
+		api.videos.search.get({q: q}, function(result) {
+			$scope.searchResults = result.items || [];
+		});
+	};
+
+	$scope.findAutocomplete = function(q, cb) {
+		api.videos.search.suggest.get({q: q}, function(result) {
+			cb(result);
+		});
+	};
+
+	$scope.$watch('searchQuery', function(val) {
+		if (val == '')
+			$scope.searchResults = [];
 	});
 }

@@ -1,5 +1,5 @@
 // search
-.well.row12.col5(ng-controller='SearchCtrl')
+.well.row12.col5
 	input.search-youtube.title(
 		type='text', 
 		placeholder='Search Youtube', 
@@ -11,7 +11,7 @@
 
 	.block-content
 		.no-content(ng-show='searchResults.length == 0') Your search yieled no result
-		.no-content(ng-show='searchResults == -1') &uarr; 
+		.no-content(ng-show='searchResults == -1') &uarr;
 			br
 			| Search videos to add in your playlist
 		div(scrollable='y', scroll-bind='searchResults')
@@ -37,95 +37,9 @@
 							.infos
 								| Views : {{result.viewCount | commaSeparateNumber}}
 
-// infos
-
-.well.col7.coloffset5.row9(ng-controller='VideoInfosCtrl')
-	.title {{playback.currentVideo.title || 'No video selected'}}
-	.block-content.block-padding(ng-show='playback.currentVideo.id')
-		p
-			strong Uploaded 
-			| {{playback.currentVideo.uploaded | timeAgo}} 
-			strong by 
-			| {{playback.currentVideo.uploader}}
-
-		p
-			strong Added to the playlist 
-			| {{playlist.items[playback.position].date | timeAgo}} 
-			strong by 
-			| {{playlist.items[playback.position].user.displayName || 'you'}} 
-			
-
-		hr
-
-		#video-description
-			div(scrollable='y', scroll-bind='playback.currentVideo.description')
-				.scrollbar
-					.track
-						.thumb
-
-				.viewport
-					.overview(ng-bind-html-unsafe='playback.currentVideo.description | formatText')
-
-		#uploader-videos
-			div(scrollable='x', scroll-bind='uploaderVideos')
-				.viewport
-					ul.horizontal-video-list.overview
-						li(
-							ng-repeat='video in uploaderVideos', 
-							ng-click='addVideo(video)'
-						)
-							.img(back-img='{{video.thumbnail.hqDefault}}')
-								.title-container {{video.title}}
-								.duration {{video.duration | secToTime}}
-				.scrollbar
-					.track
-						.thumb
-
-// remotes
-
-div(ng-controller='RemoteCtrl')
-	.well.col4.coloffset12.row6
-		.title Connected remotes ({{connectedRemotes.length}})
-		.block-content(scrollable='y', scroll-bind='connectedRemotes')
-			.no-content(ng-show='connectedRemotes.length == 0') Nobody's connected
-			.scrollbar
-				.track
-					.thumb
-
-			.viewport
-				.overview
-					ul.remote-list
-						li(
-							ng-repeat='remote in connectedRemotes'
-						)
-							img.pull-right(
-								ng-src='https://graph.facebook.com/{{remote.id}}/picture',
-								ng-show='remote.id'
-							)
-							| {{remote.displayName}}
-
-	#remote.well.col4.coloffset12.row3.rowoffset6
-		.qr-container(ng-show='active')
-			qr-code(
-				text='http://{{appDomain}}/remote?k={{roomId}}', 
-				width='1000', 
-				height='1000',
-				fg-color='#424242', 
-				bg-color='transparent'
-			)
-
-		p Remote is : 
-		p 
-			button.btn(
-				bs-button, 
-				ng-model='active',
-				ng-class='{"btn-success": active, "btn-danger": !active}'
-			) {{active && 'On' || 'Off'}}
-
-
 
 // related 
-.col11.coloffset5.row3.rowoffset9.well
+.col11.coloffset5.row3.rowoffset9.pan
 	div(
 		scrollable='x', 
 		scroll-bind='playback.currentVideo.relatedVideos'
@@ -144,65 +58,3 @@ div(ng-controller='RemoteCtrl')
 			.track
 				.thumb
 
-//playlist
-.well.col16.row4.rowoffset12(ng-controller='PlaylistCtrl')
-	.title(
-		background-progressbar, 
-		fgcolor='rgba(86, 173, 0, 0.8)', 
-		bgcolor='rgba(0,0,0, 0.6)', 
-		progress='(playback.elapsedTime + playback.currentElapsedTime) / playlist.totalTime * 100'
-	)
-		#playlistPosition {{playback.position + 1}}/{{playlist.items.length}}
-		#playlistTime {{playback.elapsedTime + playback.currentElapsedTime | secToTime}} / {{playlist.totalTime | secToTime}}
-
-		button.btn.btn-danger.pull-right(
-			ng-click='removeAll()',
-			ng-disabled='playlist.length == 0'
-		)
-			i.icon-remove-sign.icon-white
-			|  Clear
-
-		button.btn.pull-right(
-			ng-click='savePlaylist()',
-			ng-disabled='!playlist.title'
-		) Save
-
-		input.playlist-title(type='text', placeholder='Playlits title', ng-model='playlist.title')
-
-	.block-content
-		div.no-content(ng-show='playlist.items.length == 0') Your playlist is empty :(
-		div(
-			scrollable='x', 
-			scroll-bind='playlist',
-			default-update='relative'
-		)
-			.viewport
-				ul.horizontal-video-list.overview(
-					ui-sortable,
-					ui-options='{axis: "x", forcePlaceholderSize: true}'
-					ng-model='playlist.items'
-				)
-					li(
-						ng-repeat='item in playlist.items', 
-						ng-click='setIndex($index)',
-						ng-class='(playback.position == $index) && "playing"'
-					)
-						.img(back-img='{{item.video.thumbnail.hqDefault}}')
-							.title-container {{item.video.title}}
-
-							.buttons
-								button.btn.btn-danger(ng-click='removeAt($index)')
-									i.icon-remove-sign.icon-white
-
-							.duration {{item.video.duration | secToTime}}
-
-							.addedBy(
-								ui-if='item.addedBy', 
-								back-img='https://graph.facebook.com/{{item.addedBy.id}}/picture'
-							)
-
-							.playlist-id {{$index + 1}}
-
-			.scrollbar
-				.track
-					.thumb

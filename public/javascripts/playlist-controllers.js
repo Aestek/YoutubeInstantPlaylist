@@ -1,22 +1,4 @@
-function SearchCtrl($scope, api) {
 
-	// properties
-	$scope.searchResults = -1;
-
-
-	// methods
-	$scope.search = function(q) {
-		api.videos.search.get({q: q}, function(result) {
-			$scope.searchResults = result.items || [];
-		});
-	};
-
-	$scope.findAutocomplete = function(q, cb) {
-		api.videos.search.suggest.get({q: q}, function(result) {
-			cb(result);
-		});
-	};
-}
 
 function RemoteCtrl($scope, socket, guid) {
 
@@ -53,14 +35,7 @@ function RemoteCtrl($scope, socket, guid) {
 	});
 }
 
-function PlaylistCtrl($scope, api) {
-	$scope.savePlaylist = function() {
-		if ($scope.playlist._id)
-			api.playlists.put({id: $scope.playlist._id, playlist: $scope.playlist});
-		else
-			api.playlists.post({playlist: $scope.playlist});
-	};
-}
+
 
 function VideoInfosCtrl($scope, api) {
 	$scope.uploaderVideos = [];

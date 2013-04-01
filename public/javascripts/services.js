@@ -70,6 +70,13 @@ app.factory('api', function($http, $cacheFactory, $rootScope) {
 
 var authComplete;
 app.factory('auth', function($rootScope, api, $location) {
+
+	var ensureRouteAuthentication = false;
+
+	$rootScope.$on('$routeChangeSuccess', function() {
+		ensureRouteAuthentication = false;
+	});
+
 	var authStrategies = {
 		facebook: function(cb) {
 			authComplete = function(authData) {
@@ -88,6 +95,21 @@ app.factory('auth', function($rootScope, api, $location) {
 		login: function(strategy, arg1, arg2) {
 			authStrategies[strategy](arg1, arg2);
 		},
+		logout: function(cb) {
+			api.me.status.delete(function() {
+				userStateChanged({
+					authenticated: false,
+					profile: {}
+				});
+				if (cb)
+					cb();
+			});
+		},
+		ensureRouteAuthentication: function() {
+			ensureRouteAuthentication = true;
+			if (!auth.userState.authenticated)
+				$location.path('/');
+		},
 		userState: {
 			authenticated: false,
 			profile: {}
@@ -96,6 +118,8 @@ app.factory('auth', function($rootScope, api, $location) {
 
 	function userStateChanged(userData) {
 		auth.userState = userData;
+		if (!auth.userState.authenticated && ensureRouteAuthentication)
+			$location.path('/');
 		$rootScope.$emit('userStateChanged', userData);
 	}
 

@@ -4,7 +4,6 @@ html(lang='en', ng-app='app')
 		meta(charset='utf-8')
 		title YoutubeInstantPlaylist
 		
-		link(href='lib/bootstrap/less/bootstrap.css', rel='stylesheet', type='text/css')
 		link(href='stylesheets/app/app.css', rel='stylesheet', type='text/css')
 
 		script(src='lib/jquery/jquery-1.7.1.min.js', type='text/javascript')
@@ -17,10 +16,9 @@ html(lang='en', ng-app='app')
 		script(src='lib/angular-strap.js', type='text/javascript')
 		script(src='lib/jquery.tinyscrollbar.min.js', type='text/javascript')
 		script(src='lib/swfobject.js', type='text/javascript')
-		script(src='lib/jquery.cookie.js', type='text/javascript')
 		script(src='/socket.io/socket.io.js', type='text/javascript')
 		script(src='lib/jquery.qrcode.js', type='text/javascript')
-			
+
 		script(src='/api/manifest?var=apiManifest', type='text/javascript')
 		script(src='javascripts/app.js', type='text/javascript')
 		script(src='javascripts/services.js', type='text/javascript')
@@ -33,7 +31,6 @@ html(lang='en', ng-app='app')
 
 
 	body(ng-controller='MainCtrl')
-
 		script(type='text/ng-template', id='video-tmpl')
 			.img(back-img='{{video.thumbnail.hqDefault}}', ng-transclude)
 				.title-container {{video.title}}
@@ -54,14 +51,111 @@ html(lang='en', ng-app='app')
 				load-progress='playback.loadProgress'
 			)
 
-		#video-overlay
-
-		#main-navbar.navbar.navbar-inverse
-			.navbar-inner.navbar-fixed-top
-				span.brand YoutubeInstantPlaylist
-
-				ul.nav(ng-controller='PlayerControlsCtrl')
+		#main-navbar.navbar.navbar-fixed-top
+			.navbar-inner
+				ul.nav
 					li
+						a.brand(href='#/home') YoutubeInstantPlaylist
+
+				div(ng-controller='UserStateCtrl')
+					ul.nav.pull-right(ng-show='userState.authenticated')
+						li.dropdown
+							a(data-hover='dropdown') 
+								i.icon-white.icon-play-circle
+								|  Playlists
+
+							ul.dropdown-menu
+								li
+									a(href='#/playlist') Current playlist
+								li
+									a(href='#/playlists') My playlists
+
+						li.dropdown
+							a(data-hover='dropdown') 
+								i.icon-white.icon-user
+								|  {{userState.profile.infos.displayName}}
+
+							ul.dropdown-menu
+								li
+									a(href='#/profile') Profile
+								li
+									a(ng-click='logout()') Logout
+
+
+					ul.nav.pull-right(ng-show='!userState.authenticated')
+						li
+							a(href='#/login') Login
+
+				div(ng-controller='SearchCtrl')
+					form.navbar-form.pull-right(
+						ng-class='{open: "searchResults.length > 0"}'
+					)
+						button.close.pull-right(
+							ng-show='searchResults.length > 0',
+							ng-click='searchQuery = ""'
+						) ×
+						input.search-query(
+							type='text', 
+							placeholder='Search Youtube', 
+							ng-model='searchQuery',
+							ui-keypress='{13: \'search(searchQuery)\'}',
+							bs-typeahead='findAutocomplete',
+							bs-typeahead-updater='search'
+						)
+						ul.vertical-video-list
+							li(
+								ng-repeat='result in searchResults',
+								title='{{result.title}}',
+								ng-click='addVideo(result)'
+							)
+			
+								.img(back-img='{{result.thumbnail.hqDefault}}')
+									.length {{result.duration | secToTime}}
+								.title {{result.title}}
+								.progress
+									.bar.bar-success(style='width: {{result.rating * 20}}%')
+									.bar.bar-danger(style='width: {{100 - result.rating * 20}}%')
+								.infos
+									| Views : {{result.viewCount | commaSeparateNumber}}
+
+
+
+		.main-container
+			div(ng-view)
+
+
+		#playlist.pane(ng-controller='PlaylistCtrl')
+			.title(
+				background-progressbar, 
+				fgcolor='rgba(86, 173, 0, 0.8)', 
+				bgcolor='rgba(0,0,0, 0.6)', 
+				progress='(playback.elapsedTime + playback.currentElapsedTime) / playlist.totalTime * 100'
+			)
+				
+
+				ul.pull-right
+					li
+						button.btn.btn-danger.pull-right(
+							ng-click='removeAll()',
+							ng-disabled='playlist.length == 0'
+						)
+							i.icon-remove-sign.icon-white
+							|  Clear
+					li
+
+						button.btn.pull-right(
+							ng-click='savePlaylist()',
+							ng-disabled='!playlist.title'
+						) Save
+				ul
+					li.playlist-position {{playback.position + 1}}/{{playlist.items.length}}
+					li.playlist-time {{playback.elapsedTime + playback.currentElapsedTime | secToTime}} / {{playlist.totalTime | secToTime}}
+					
+
+				ul.player-controls(ng-controller='PlayerControlsCtrl')
+					li.divider-vertical
+
+					li.dropdown
 						a.dropdown-toggle(
 							ng-click='playback.mute = !playback.mute'
 							data-hover='dropdown',
@@ -70,9 +164,10 @@ html(lang='en', ng-app='app')
 							i.icon-white(
 								ng-class='{"icon-volume-up" : playback.volume > 50 && !playback.mute, "icon-volume-down" : playback.volume <= 50  && !playback.mute, "icon-volume-off": playback.mute}'
 							)
+
 						ul.dropdown-menu.volume-dropdown
 							li(no-click)
-								.progress(vertical-progress-bar='playback.volume')
+								.progress.vertical(vertical-progress-bar='playback.volume')
 									.bar.bar-success
 
 					li.divider-vertical
@@ -104,22 +199,18 @@ html(lang='en', ng-app='app')
 
 					li.divider-vertical
 
-					li
+					li.dropdown
 						a(data-hover='dropdown') 
 							i.icon-white.icon-cog
 						
 						ul.dropdown-menu.quality-dropdown
-							li.dropdown-submenu
-								a {{displayQualities[playback.currentQuality] || 'Quality'}}
-
-								ul.dropdown-menu
-									li(
-										ng-repeat='quality in playback.qualityLevels',
-										ng-class='{active: quality == playback.currentQuality}'
-									)
-										a(ng-click='setQuality(quality)') {{displayQualities[quality]}}
-									li
-										a(ng-click='setQuality("default")') Default
+							li(
+								ng-repeat='quality in playback.qualityLevels',
+								ng-class='{active: quality == playback.currentQuality}'
+							)
+								a(ng-click='setQuality(quality)') {{displayQualities[quality]}}
+							li
+								a(ng-click='setQuality("default")') Default
 
 					li.divider-vertical
 
@@ -133,15 +224,40 @@ html(lang='en', ng-app='app')
 						)
 						.video-time {{playback.currentVideo.duration | secToTime}}
 
-				div
-					ul.nav.pull-right(ng-show='userState.authenticated')
-						li
-							a(href='#/playlists') My playlists
+			.block-content
+				div.no-content(ng-show='playlist.items.length == 0') Your playlist is empty :(
+				div(
+					scrollable='x', 
+					scroll-bind='playlist',
+					default-update='relative'
+				)
+					.viewport
+						ul.horizontal-video-list.overview(
+							ui-sortable,
+							ui-options='{axis: "x", forcePlaceholderSize: true}'
+							ng-model='playlist.items'
+						)
+							li(
+								ng-repeat='item in playlist.items', 
+								ng-click='setIndex($index)',
+								ng-class='(playback.position == $index) && "playing"'
+							)
+								.img(back-img='{{item.video.thumbnail.hqDefault}}')
+									.title-container {{item.video.title}}
 
-					ul.nav.pull-right(ng-show='!userState.authenticated')
-						li
-							a(href='#/login') Login
+									.buttons
+										button.btn.btn-danger(ng-click='removeAt($index)')
+											i.icon-remove-sign.icon-white
 
+									.duration {{item.video.duration | secToTime}}
 
-		.main-container
-			div(ng-view)
+									.addedBy(
+										ui-if='item.addedBy', 
+										back-img='https://graph.facebook.com/{{item.addedBy.id}}/picture'
+									)
+
+									.playlist-id {{$index + 1}}
+
+					.scrollbar
+						.track
+							.thumb

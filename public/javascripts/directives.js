@@ -241,12 +241,12 @@ app.directive('verticalProgressBar', function() {
 	 		$el.mousedown(function(e) {
 	 			setProgress(e.pageY);
 
-	 			$el.mousemove(function(e) {
+	 			$(window).mousemove(function(e) {
 	 				setProgress(e.pageY);
 	 			});
 
 	 			$(window).one('mouseup', function() {
-	 				$el.unbind('mousemove');
+	 				$(window).unbind('mousemove');
 	 			});
 	 		});
 
