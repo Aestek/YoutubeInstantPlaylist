@@ -1,4 +1,9 @@
-@import url(http://fonts.googleapis.com/css?family=Handlee);
+@font-face {
+  font-family: 'Handlee';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Handlee Regular'), local('Handlee-Regular'), url(https://themes.googleusercontent.com/static/fonts/handlee/v2/6AfIXNH5pZ1Jj_pfExPOWQ.woff) format('woff');
+}
 
 html, body {
 	height: 100%;
@@ -30,7 +35,6 @@ h1 {
 		height: 29px;
 		line-height: 20px;
 		background: @primary-1;
-		border-bottom: 1px solid darken(@primary-1, 15%);
 		color: white;
 
 		& > ul {

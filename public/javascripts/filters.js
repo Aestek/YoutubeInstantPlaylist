@@ -9,6 +9,7 @@ app.filter('formatText', function() {
 
 app.filter('secToTime', function() {
 	return function(input) {
+		input = input || 0;
 		sec_numb    = parseInt(input);
 	    var hours   = Math.floor(sec_numb / 3600);
 	    var minutes = Math.floor((sec_numb - (hours * 3600)) / 60);

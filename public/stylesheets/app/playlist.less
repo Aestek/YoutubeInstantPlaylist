@@ -3,8 +3,9 @@
 	bottom: 0;
 	height: 200px;
 	width: 100%;
-	box-shadow: 0 -2px 10px #000000;
-
+	padding-bottom: 5px;
+	box-shadow: 0 -2px 5px rgba(0,0,0,0.5);
+	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
 
 	.title {
 		height: 30px;
@@ -76,6 +77,36 @@
 			border-left:  1px solid rgba(0,0,0,0.2);
 			margin: -5px 15px -5px 10px;
 			height: 40px;
+		}
+
+
+		.current-title {
+			color: white;
+			font-weight: bold;
+			width: 310px;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+
+		.current-progress {
+			display: inline-block;
+			width: 250px;
+			height: 8px;
+			margin: 0;
+			cursor: pointer;
+		}
+
+		.video-time {
+			display: inline-block;
+			margin: 0 5px 0;
+			line-height: 15px;
+			font-size: x-small;
+			color: #999999;
+		}
+
+		.bar-load {
+			opacity: 0.3;
 		}
 	}
 }

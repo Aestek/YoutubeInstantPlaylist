@@ -6377,33 +6377,6 @@ a.badge:focus {
   color: #fefefe;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
 }
-#main-navbar .current-title {
-  color: white;
-  font-weight: bold;
-  width: 310px;
-  height: 18px;
-  margin: 3px 5px 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-#main-navbar .current-progress {
-  display: inline-block;
-  width: 250px;
-  height: 8px;
-  margin: 0;
-  cursor: pointer;
-}
-#main-navbar .video-time {
-  display: inline-block;
-  margin: 0 5px 0;
-  line-height: 15px;
-  font-size: x-small;
-  color: #999999;
-}
-#main-navbar .bar-load {
-  opacity: 0.3;
-}
 #main-navbar form.navbar-form {
   position: relative;
   padding: 0 10px;
@@ -6454,7 +6427,6 @@ h1 {
   height: 29px;
   line-height: 20px;
   background: #d01c35;
-  border-bottom: 1px solid #8d1324;
   color: white;
 }
 .pane > .title > ul {
@@ -6504,7 +6476,9 @@ h1 {
   bottom: 0;
   height: 200px;
   width: 100%;
-  box-shadow: 0 -2px 10px #000000;
+  padding-bottom: 5px;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
 }
 #playlist .title {
   height: 30px;
@@ -6563,6 +6537,31 @@ h1 {
   border-left: 1px solid rgba(0, 0, 0, 0.2);
   margin: -5px 15px -5px 10px;
   height: 40px;
+}
+#playlist .title .current-title {
+  color: white;
+  font-weight: bold;
+  width: 310px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+#playlist .title .current-progress {
+  display: inline-block;
+  width: 250px;
+  height: 8px;
+  margin: 0;
+  cursor: pointer;
+}
+#playlist .title .video-time {
+  display: inline-block;
+  margin: 0 5px 0;
+  line-height: 15px;
+  font-size: x-small;
+  color: #999999;
+}
+#playlist .title .bar-load {
+  opacity: 0.3;
 }
 .login-list {
   list-style-type: none;

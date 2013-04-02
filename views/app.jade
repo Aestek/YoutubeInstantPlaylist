@@ -127,34 +127,12 @@ html(lang='en', ng-app='app')
 		#playlist.pane(ng-controller='PlaylistCtrl')
 			.title(
 				background-progressbar, 
-				fgcolor='rgba(86, 173, 0, 0.8)', 
-				bgcolor='rgba(0,0,0, 0.6)', 
+				fgcolor='#B31329', 
+				bgcolor='#D01C35', 
 				progress='(playback.elapsedTime + playback.currentElapsedTime) / playlist.totalTime * 100'
-			)
-				
-
-				ul.pull-right
-					li
-						button.btn.btn-danger.pull-right(
-							ng-click='removeAll()',
-							ng-disabled='playlist.length == 0'
-						)
-							i.icon-remove-sign.icon-white
-							|  Clear
-					li
-
-						button.btn.pull-right(
-							ng-click='savePlaylist()',
-							ng-disabled='!playlist.title'
-						) Save
-				ul
-					li.playlist-position {{playback.position + 1}}/{{playlist.items.length}}
-					li.playlist-time {{playback.elapsedTime + playback.currentElapsedTime | secToTime}} / {{playlist.totalTime | secToTime}}
-					
+			)					
 
 				ul.player-controls(ng-controller='PlayerControlsCtrl')
-					li.divider-vertical
-
 					li.dropdown
 						a.dropdown-toggle(
 							ng-click='playback.mute = !playback.mute'
@@ -214,8 +192,7 @@ html(lang='en', ng-app='app')
 
 					li.divider-vertical
 
-					li(ng-show='playback.currentVideo.id')
-						.current-title(title='{{playback.currentVideo.title}}') {{playback.currentVideo.title}}
+					li
 						.video-time {{playback.currentElapsedTime | secToTime}}
 						.current-progress.progress(
 							song-progress-bar='{{playback.currentElapsedTime / playback.currentVideo.duration * 100}}', 
@@ -223,6 +200,10 @@ html(lang='en', ng-app='app')
 							change='seekTo(value)'
 						)
 						.video-time {{playback.currentVideo.duration | secToTime}}
+
+					li
+						.current-title(title='{{playback.currentVideo.title}}') {{playback.currentVideo.title}}
+
 
 			.block-content
 				div.no-content(ng-show='playlist.items.length == 0') Your playlist is empty :(
