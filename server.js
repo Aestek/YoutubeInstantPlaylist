@@ -50,7 +50,7 @@ app.configure('development', function(){
 app.get('/', routes.index);
 app.get('/app', routes.app);
 app.get('/remote', routes.remote);
-app.get('/partials/:id', routes.partials)
+app.get('/partials/:id', routes.partials);
 
 require('./lib/api')(app);
 

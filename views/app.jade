@@ -22,6 +22,7 @@ html(lang='en', ng-app='app')
 		script(src='/api/manifest?var=apiManifest', type='text/javascript')
 		script(src='javascripts/app.js', type='text/javascript')
 		script(src='javascripts/services.js', type='text/javascript')
+		script(src='javascripts/home-controllers.js', type='text/javascript')
 		script(src='javascripts/app-controllers.js', type='text/javascript')
 		script(src='javascripts/playlist-controllers.js', type='text/javascript')
 		script(src='javascripts/playlists-controllers.js', type='text/javascript')
@@ -221,23 +222,14 @@ html(lang='en', ng-app='app')
 							li(
 								ng-repeat='item in playlist.items', 
 								ng-click='setIndex($index)',
-								ng-class='(playback.position == $index) && "playing"'
+								ng-class='(playback.position == $index) && "playing"',
+								video-thumbnail='item.video'
 							)
-								.img(back-img='{{item.video.thumbnail.hqDefault}}')
-									.title-container {{item.video.title}}
+								.buttons
+									button.btn.btn-danger(ng-click='removeAt($index)')
+										i.icon-remove-sign.icon-white
 
-									.buttons
-										button.btn.btn-danger(ng-click='removeAt($index)')
-											i.icon-remove-sign.icon-white
-
-									.duration {{item.video.duration | secToTime}}
-
-									.addedBy(
-										ui-if='item.addedBy', 
-										back-img='https://graph.facebook.com/{{item.addedBy.id}}/picture'
-									)
-
-									.playlist-id {{$index + 1}}
+								.playlist-id {{$index + 1}}
 
 					.scrollbar
 						.track
